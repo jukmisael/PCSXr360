@@ -4087,7 +4087,7 @@ Pal
 <Visual>XuiCheckbox</Visual>
 <NavUp>LinearFilterCbox</NavUp>
 <NavDown>GpuThCbox</NavDown>
-<Text>Use Dynarec</Text>
+<Text>Use Interpreter (Legacy)</Text>
 </Properties>
 </XuiCheckbox>
 <XuiCheckbox>

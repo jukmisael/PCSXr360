@@ -57,7 +57,7 @@ void RunPcsx(char * game) {
 	int res, ret;
 	XMemSet(&Config, 0, sizeof(PcsxConfig));
 	
-	Config.Cpu = CPU_INTERPRETER;
+	Config.Cpu = CPU_DYNAREC;  // Dynarec como padrão para melhor performance
 
 	strcpy(Config.Bios, "SCPH1001.BIN"); // Use actual BIOS
 	//strcpy(Config.Bios, "HLE"); // Use HLE

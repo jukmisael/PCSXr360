@@ -165,7 +165,7 @@ protected:
 
 
 		// Init values from xbox config
-		DynarecCbox.SetCheck(xboxConfig.UseDynarec);
+		DynarecCbox.SetCheck(!xboxConfig.UseDynarec);  // Invertido: checkbox marcado = Interpreter
 		GpuThCbox.SetCheck(xboxConfig.UseThreadedGpu);
 		SpuIrqCbox.SetCheck(xboxConfig.UseSpuIrq);
 		FrameLimitCbox.SetCheck(xboxConfig.UseFrameLimiter);
@@ -237,7 +237,7 @@ protected:
 		}
 
 		if (hObjPressed == DynarecCbox) {
-			xboxConfig.UseDynarec = DynarecCbox.IsChecked();
+			xboxConfig.UseDynarec = !DynarecCbox.IsChecked();  // Invertido: unchecked = Dynarec (padrao)
 		}
 
 		if (hObjPressed == GpuThCbox) {
@@ -350,7 +350,7 @@ protected:
 			//Set checkbox with right configs from game profile  @Dreamboy 23/12/2016
 
 		    LinearFilterCbox.SetCheck(xboxConfig.UseLinearFilter);
-		    DynarecCbox.SetCheck(xboxConfig.UseDynarec);
+		    DynarecCbox.SetCheck(!xboxConfig.UseDynarec);  // Invertido
 		    GpuThCbox.SetCheck(xboxConfig.UseThreadedGpu);
 		    SpuIrqCbox.SetCheck(xboxConfig.UseSpuIrq);
 			FrameLimitCbox.SetCheck(xboxConfig.UseFrameLimiter);

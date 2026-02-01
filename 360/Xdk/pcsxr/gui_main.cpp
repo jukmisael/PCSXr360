@@ -5,9 +5,11 @@
 #include "cdrom.h"
 #include "r3000a.h"
 #include "gpu.h"
+#include "../../../libpcsxcore/misc.h"
 #include "sys\Mount.h"
 #include "simpleini\SimpleIni.h"
 #include "aurora.h"  // swizzy rom loading aurora dash
+#include "../../../libpcsxcore/profiler.h"
 #include <string>
 #include <xuiapp.h>
 
@@ -17,38 +19,36 @@ void RenderXui();
 HXUIOBJ hMainScene;
 
 DWORD * InGameThread() {
-
-	while(1) 
-	  {
+	while(1) {
 		XINPUT_STATE InputState;
-		DWORD XInputErr=XInputGetState( 0, &InputState );
-		if(	XInputErr != ERROR_SUCCESS)
-		continue;
-		/*
-		// Check if some button are pressed
-		if(InputState.Gamepad.wButtons & XINPUT_GAMEPAD_BACK && InputState.Gamepad.wButtons & XINPUT_GAMEPAD_START) 
-		{
-			OutputDebugStringA("Pause !!");
+		DWORD XInputErr=XInputGetState(0, &InputState);
+		if (XInputErr != ERROR_SUCCESS)
+			continue;
+		
+		// Menu/Exit combo: LB + RB + A + B + X + Y
+		if (InputState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER && 
+			InputState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER &&
+			InputState.Gamepad.wButtons & XINPUT_GAMEPAD_A && 
+			InputState.Gamepad.wButtons & XINPUT_GAMEPAD_B &&
+			InputState.Gamepad.wButtons & XINPUT_GAMEPAD_X && 
+			InputState.Gamepad.wButtons & XINPUT_GAMEPAD_Y) {
+			OutputDebugStringA("Menu combo pressed");
 			PausePcsx();
 			xboxConfig.ShutdownRequested = true;
 		}
-		*/
 
-		if(	InputState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER && InputState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER
-			&& InputState.Gamepad.wButtons & XINPUT_GAMEPAD_A && InputState.Gamepad.wButtons & XINPUT_GAMEPAD_B
-			&& InputState.Gamepad.wButtons & XINPUT_GAMEPAD_X && InputState.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
-		{
-
-			OutputDebugStringA("Pause !!");
-			PausePcsx();
-			xboxConfig.ShutdownRequested = true;
-
+		// Profiler toggle combo: LB + RB + BACK (Select)
+		if (InputState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER && 
+			InputState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER &&
+			InputState.Gamepad.wButtons & XINPUT_GAMEPAD_BACK) {
+			OutputDebugStringA("Profiler toggle pressed");
+			Profiler_Toggle();
+			Sleep(200); // Debounce
 		}
 
 		Sleep(50);
-	  }
+	}
 	return NULL;
-
 }
 
 #define MAX_FILENAME 256
@@ -262,7 +262,7 @@ void LoadSettings() {
     //Merge cfg file
 	ini.LoadFile(gameprofile.c_str());
 
-	xboxConfig.UseDynarec         = ini.GetLongValue("pcsx", "UseDynarec",         0);
+	xboxConfig.UseDynarec         = ini.GetLongValue("pcsx", "UseDynarec",         1);  // Dynarec ativo por padrao
 	xboxConfig.UseThreadedGpu     = ini.GetLongValue("pcsx", "UseThreadedGpu",     0);
 	xboxConfig.UseSpuIrq          = ini.GetLongValue("pcsx", "UseSpuIrq",          0);
 	xboxConfig.UseFrameLimiter    = ini.GetLongValue("pcsx", "UseFrameLimiter",    0);
@@ -425,6 +425,12 @@ void DoPcsx(std::string sgame){
 
 	LoadShaderFromFile(xboxConfig.Shaders);
 	CoverSystemAndGameProfile(getgameID());
+
+	// Initialize profiler with game ID after CDROM is loaded
+	if (CdromId[0] != '\0') {
+		Profiler_Init(CdromId, CdromLabel);
+		SysPrintf("Profiler initialized for game: %s (%s)\r\n", CdromId, CdromLabel);
+	}
 
 	SysPrintf("Execute\r\n");
 	psxCpu->Execute();

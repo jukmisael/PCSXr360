@@ -23,6 +23,7 @@
 
 #include "psxcounters.h"
 #include "gpu.h"
+#include "profiler.h"
 
 /******************************************************************************/
 
@@ -298,8 +299,12 @@ __inline void psxRcntUpdate()
             GPU_vBlank( 0 );
             setIrq( 0x01 );
 
+            // Frame end - profiler tracking for real video frame
+            Profiler_FrameEnd();
 			gpuUpdateLace();
             EmuUpdate();
+            // Frame begin - new video frame starts
+            Profiler_FrameBegin();
         }
     }
 

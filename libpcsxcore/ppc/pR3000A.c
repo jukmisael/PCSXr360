@@ -1092,7 +1092,7 @@ __inline static void execute() {
 void recExecute() {
     while(Config.CpuRunning) {
         execute();
-	}
+    }
 }
 
 void recExecuteBlock() {
