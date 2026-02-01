@@ -1,103 +1,89 @@
+# PCSXr360
 
-![pcsxr](https://github.com/user-attachments/assets/389f7e4e-8a22-4e08-906d-8005b0e8bfc8)
+[![Nightly](https://img.shields.io/badge/Version-Nightly-blue.svg)](https://github.com/mLoaDs/PCSXr360/releases)
+[![Platform](https://img.shields.io/badge/Platform-Xbox%20360-green.svg)](https://www.xbox.com)
+[![License](https://img.shields.io/badge/License-GPLv2-yellow.svg)](LICENSE)
 
-# PCSXr360 
-Is an PlayStation One emulator for the XBox 360 ported from Ced2911 and other developers
+**Emulador de PlayStation 1 para Xbox 360**
 
-PCSX-Reloaded is a forked version of the dead PCSX emulator
+PCSXr360 é um emulador de PlayStation 1 (PS1/PSX) desenvolvido para o console Xbox 360, baseado no PCSX-Reloaded com melhorias e otimizações específicas para a plataforma.
 
-How to: https://github.com/mLoaDs/PCSXr360/wiki
+## 📋 Recursos
 
-- Dreamboy
-- thomasmaruzs
-- cmkn1983
-- Swizzy
-- and others whose names I don't know
-- https://github.com/Ced2911/cloaked-ninja
---------------------------------------
+- 🎮 **Compatibilidade** com grande biblioteca de jogos PS1
+- 🎵 **Áudio melhorado** com sistema de reverb otimizado
+- 📁 **Suporte a múltiplos formatos**: BIN/CUE, ISO, IMG
+- 🎨 **Shaders e filtros** para melhoria visual
+- 📊 **Profiler integrado** para análise de performance
+- 🔄 **Game profiles** individuais por jogo
+- 🌐 **Suporte Aurora/FSD** com carregamento de ROMs
 
-v2.1.1a PNG Fix
----------------
-* Changelog:
-  
-   - Improvements:
-      - Remove.jpg format
-      - Added .png format for all image and cover files
+## 🚀 Instalação
 
-v2.1.1a
--------
-* Changelog:
-    - Compatibillity:
-        - Added Swizzy's ROM loading data support from Aurora, now with gameprofile support.
-        - Re-Added psx.iso autoboot for Freestyle Dash / Aurora cover mode, now with gameprofile support. 
-            You have to put psx.iso in emulator root folder, and psx.iso.ini in the gameprofile folder and set AutobootIso = 1 in pcsx.ini on the emulator root.
+1. Copie a pasta do emulador para seu Xbox 360 (USB/HDD)
+2. Coloque suas ROMs de PS1 na pasta `roms`
+3. Execute o `default.xex`
 
-    - Improvements:
-        - Fixed sync game selected between cover modes.
-        - Fixed profile menu setup, now every game profile setup is individual (as it was initialy supposed to).
-        - Emulator assets are now packed into 'PsxSkin.xzp'.
-        - Fixed LoadGameProfile at current selection, so you dont have to press Y button to load gamesettings for booting game profile correctly.
-        - Fixed game profile loading after exit a game, to select new game to play.
-        - Fixed shaders to re-add it into gameprofile settings, instead of another .ini file in gameshaders (since it doesnt make much sense).
-        - Some code cleanups.
-        
-    - UI:
-        - Added image for Devices.
-        - Added psedo new OsdMenu.
-        - New osdmenu ingame combo LB + RB + ABXY, now you dont need to change Freestyle Dash / Aurora screenshot combo anymore.
+## 📖 Documentação
 
-    - Regression/Freeze Fixes:
-        - Fixed ui freeze (press LT+RT to get back to function properly before).
-        - Fixed covermode initial value (cover modes freeze).
+- **Changelog completo**: Veja [psx_readme.txt](psx_readme.txt) para histórico de versões
+- **Wiki**: [github.com/mLoaDs/PCSXr360/wiki](https://github.com/mLoaDs/PCSXr360/wiki)
+- **Controles e configurações**: Disponíveis no menu do emulador
 
-* Whats not included in this release yet for the lack of time/ not finished:
-    - Html Game Guide.
-    - Games sorting by first letter.
-    - 4 player multitap support.
-        
-* Known Issues:
-    - XUI Issue on osdmenu: if you autoboot psx.iso or load a rom from aurora, it kinda works. but it will open main scene first then you have to select a game and it will open osdmenu and resume the supposed action. after that you can use it normaly
+## 🛠️ Requisitos
 
-v2.1.0
-  ------
-* 2 Variants
-    - Base 2.1.0 version.
-    - CTR-Fix version.
+- Xbox 360 com RGH/JTAG
+- Freestyle Dash ou Aurora Dashboard
+- Arquivos de BIOS do PS1 (colocar na pasta `bios`)
 
-* Changelog:
-    - Just one build, no more old and new cdr plugin builds, everthing is in a single default.xex.
-    - Fixed text encoding issues on the end of the text, when the game guide is loaded (Byte order mark issues). 
-        Still, remember to set any gameguide text on notepad to unicode big endian format (File->save as, then change from ansi to unicode big endian, then save the gameguide.txt).
+## 🎮 Controles In-Game
 
-    - Compatibillity
-        - CDDA games are working fine and the compatibility was maintained (Noticiable in games like Dead or Alive Series).
-        - Added cpu bias option. 
-            Turning this option "on" will make the emulator run faster, setting the bias in the core to "3", but it will underclock the psx cpu. 
-            It's good for some games that dont use the full psx power, most 2d games or some 3d games with less cpu demand like brigandine. 
-            Heavy cpu games (tekken 2,3) will suffer from a lot of slowdowns.
+| Combinação | Função |
+|------------|--------|
+| LB + RB + A + B + X + Y | Menu OSD / Sair do jogo |
+| LB + RB + BACK | Toggle profiler |
+| Right Stick Click | Sair para dashboard |
 
-    - UI
-        - Added option to exit to dash on main menu (right thumb click button).
-        - Added linear filter options (again).
-        - Fixes the "B" (Back) button, now it correctly returns to the main menu. 
-            On previous version, this button was used to load the profile settings, sorry for my stupidity :P.
+> **Nota**: BACK + START é o atalho do Xbox 360 para screenshots (Aurora/FSD)
 
-    - Regression/Freeze Fixes:
-        - Soul Calibur (when you finish the game).
-        - Tomb Raider 3 (when entering on ingame menu and try to return to the game again).
-        - Brave Fencer Musashi (voices).
-        - Valkirie Profile (BGM).
-        - Front Mission 3 (Random freezes in the main menu and during battles, when your wanzer or the enemy wanzer has the legs smashed).
+## 📁 Estrutura de Pastas
 
-v2.0.9
-------
-* 2 Variants:
-    - Old CDR Plugin.
-    - New CDR Plugin.
+```
+PCSXr360/
+├── bios/           # Arquivos BIOS do PS1
+├── roms/           # ROMs dos jogos
+├── gameprofile/    # Perfis individuais por jogo
+├── shaders/        # Shaders HLSL
+├── covers/         # Imagens de capa (.png)
+├── gameguides/     # Guias de jogos (.txt)
+└── default.xex     # Executável principal
+```
 
-* Changelog:
-    - New shaders by retroarch added (new hls folder).
-    - Virtual Memory was removed (VM broke some games).
-    - Fix on SPU caused a overall improvement on sound effects for all games (Noticiable in games like Ridge Race Type 4 / Megamen X Series and others).
-    - Fix some gameguide problems
-    - Fix on PPC Dynarec from the PCSX Reloaded source code.
+## 🔧 Perfil de Jogo
+
+Cada jogo pode ter configurações individuais:
+- CPU Bias (underclock para performance)
+- Shaders personalizados
+- Configurações de áudio
+- Memory cards virtuais individuais
+
+## 🐛 Debug
+
+- Log de debug: `game:\debug_log.txt`
+- Profiling: `game:\profiling\[GAMEID]_profile.log`
+
+## 👥 Créditos
+
+- **mLoaD** - Desenvolvimento e manutenção
+- **Ced2911** - Base inicial do port
+- **Swizzy** - Suporte a ROM loading do Aurora
+- **Dreamboy, thomasmaruzs, cmkn1983** - Contribuições
+- Comunidade PCSX-Reloaded
+
+## 📄 Licença
+
+Este projeto é licenciado sob GPLv2. Veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+---
+
+**Nota**: Esta é uma versão nightly em desenvolvimento ativo. Para versões estáveis, verifique a página de releases.
