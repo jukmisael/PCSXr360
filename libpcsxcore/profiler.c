@@ -62,7 +62,11 @@ static ProfilerState g_profiler;
 // ============================================================================
 
 static void CreateProfilingDir(void) {
-    CreateDirectoryA(PROFILER_LOG_DIR, NULL);
+    // Cria o diretório de profiling (não falha se já existir)
+    if (!CreateDirectoryA(PROFILER_LOG_DIR, NULL)) {
+        // Se falhou, tenta garantir que o path existe
+        // No Xbox 360, game:\ deve sempre existir
+    }
 }
 
 static void GenerateLogFilename(void) {

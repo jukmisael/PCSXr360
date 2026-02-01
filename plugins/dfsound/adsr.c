@@ -156,6 +156,7 @@ static INLINE int MixADSR(int ch)                             // MIX ADSR
 {    
  int EnvelopeVol = s_chan[ch].ADSRX.EnvelopeVol;
  int EnvelopeVol_f = s_chan[ch].ADSRX.EnvelopeVol_f;
+ int ret;
 
 
  // dead volume - voice on
@@ -189,9 +190,11 @@ static INLINE int MixADSR(int ch)                             // MIX ADSR
 
    
    s_chan[ch].ADSRX.EnvelopeVol=EnvelopeVol;
-	 s_chan[ch].ADSRX.EnvelopeVol_f=EnvelopeVol_f;
+ 	 s_chan[ch].ADSRX.EnvelopeVol_f=EnvelopeVol_f;
    s_chan[ch].ADSRX.lVolume=EnvelopeVol>>5;
-   return EnvelopeVol>>5;
+   ret = EnvelopeVol>>5;
+   if (ret > 32767) ret = 32767;  // Limiter para evitar overflow
+   return ret;
   }
  else                                                  // not stopped yet?
   {
@@ -256,7 +259,7 @@ static INLINE int MixADSR(int ch)                             // MIX ADSR
 		 s_chan[ch].ADSRX.EnvelopeVol=EnvelopeVol;
 		 s_chan[ch].ADSRX.EnvelopeVol_f=EnvelopeVol_f;
 		 s_chan[ch].ADSRX.lVolume=EnvelopeVol>>5;
-     return EnvelopeVol>>5;
+		 ret = EnvelopeVol>>5; if (ret > 32767) ret = 32767; return ret;
     }
    //--------------------------------------------------//
    if(s_chan[ch].ADSRX.State==2)                       // -> sustain
@@ -314,10 +317,10 @@ static INLINE int MixADSR(int ch)                             // MIX ADSR
 		 s_chan[ch].ADSRX.EnvelopeVol=EnvelopeVol;
 		 s_chan[ch].ADSRX.EnvelopeVol_f=EnvelopeVol_f;
 		 s_chan[ch].ADSRX.lVolume=EnvelopeVol>>5;
-     return EnvelopeVol>>5;
+     ret = EnvelopeVol>>5; if (ret > 32767) ret = 32767; return ret;
     }
-  }
- return 0;
+   }
+  return 0;
 }
 
 #endif

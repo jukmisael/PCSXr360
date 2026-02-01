@@ -45,7 +45,7 @@ void ReadConfig(void)
 	iXAPitch=0;
 	if(spuirq){iSPUIRQWait=1;}else{iSPUIRQWait=0;}
 	iUseTimer=0;
-  	iUseReverb=2;
+  	iUseReverb=1;
 	iUseInterpolation=2;
 	iDisStereo=0;
 	iFreqResponse=0;

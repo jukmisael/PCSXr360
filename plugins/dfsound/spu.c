@@ -166,6 +166,7 @@ static int iSecureStart=0; // secure start counter
 
 // dirty inline func includes
 
+#include "registers.h"
 #include "reverb.c"
 #include "adsr.c"
 
@@ -999,6 +1000,12 @@ if(!tombraider2fix)
 			sl = SSumL[ns]; SSumL[ns]=0;
 			sr = SSumR[ns]; SSumR[ns]=0;
 
+			// Limiter para evitar overflow de volume
+			if (sl > 98304) sl = 98304;  // Limita a ~3x o volume normal
+			if (sl < -98304) sl = -98304;
+			if (sr > 98304) sr = 98304;
+			if (sr < -98304) sr = -98304;
+
 
 			/*
 			Frequency Response
@@ -1031,12 +1038,20 @@ if(!tombraider2fix)
 		} else {
 			SSumL[ns]+=MixREVERBLeft(ns);
 
+			// Limiter para prevenir overflow
+			if (SSumL[ns] > 98304) SSumL[ns] = 98304;
+			if (SSumL[ns] < -98304) SSumL[ns] = -98304;
+			
 			d=SSumL[ns]/voldiv;SSumL[ns]=0;
 			if(d<-32767) d=-32767;if(d>32767) d=32767;
 			*pS++=d;
 
 			SSumR[ns]+=MixREVERBRight();
 
+			// Limiter para prevenir overflow
+			if (SSumR[ns] > 98304) SSumR[ns] = 98304;
+			if (SSumR[ns] < -98304) SSumR[ns] = -98304;
+			
 			d=SSumR[ns]/voldiv;SSumR[ns]=0;
 			if(d<-32767) d=-32767;if(d>32767) d=32767;
 			*pS++=d;
@@ -1302,6 +1317,7 @@ void SetupStreams(void)
  sRVBEnd  = sRVBStart + i;
  sRVBPlay = sRVBStart;
 
+ InitReverbSystem();
  XAStart =                                             // alloc xa buffer
   (uint32_t *)malloc(44100 * sizeof(uint32_t));
  XAEnd   = XAStart + 44100;
@@ -1337,6 +1353,7 @@ void RemoveStreams(void)
  pSpuBuffer = NULL;
  free(sRVBStart);                                      // free reverb buffer
  sRVBStart = NULL;
+ ShutdownReverbSystem();
  free(XAStart);                                        // free XA buffer
  XAStart = NULL;
  free(CDDAStart);                                      // free CDDA buffer

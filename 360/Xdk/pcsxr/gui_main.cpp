@@ -28,9 +28,10 @@ static FILE* g_debug_log = NULL;
 
 void DebugLog_Init() {
     if (!g_debug_log) {
-        g_debug_log = fopen("game:\\debug_log.txt", "a");
+        // Modo "w" para sobrescrever e evitar arquivo gigante
+        g_debug_log = fopen("game:\\debug_log.txt", "w");
         if (g_debug_log) {
-            fprintf(g_debug_log, "\n=== Debug Log Iniciado ===\n");
+            fprintf(g_debug_log, "=== Debug Log Iniciado ===\n");
             fflush(g_debug_log);
         }
     }
