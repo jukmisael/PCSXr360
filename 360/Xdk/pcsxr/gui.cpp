@@ -151,6 +151,7 @@ protected:
         GetChildById( L"bgcolorProfile", &bgcolorProfile);
 		GetChildById( L"ExitBtn",        &ExitBtn);
 
+		/*
 		if(debugmode){
 			txtteste.SetShow(true);
 			txtteste.SetText(&xboxConfig.CoverPath[0]);
@@ -159,7 +160,7 @@ protected:
 			txtteste.SetShow(false);
 			txtTitleEmu.SetText(L"PCSXR-360 Release 2.1.1 by Dreamboy - Special thanks go to ced2911 & cmkn1983 & Swizzy for internal coding");
 		}
-		txtGameProfileInfo.SetShow(false);
+		txtGameProfileInfo.SetShow(false); */
 
 		
 
