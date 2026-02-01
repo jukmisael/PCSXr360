@@ -40,9 +40,44 @@ float  fps_cur  = 0;
 
 #define MAXLACE 16
 
+// Estatisticas para frame limiter adaptativo (Xbox 360)
+static unsigned long s_adaptive_lastcheck = 0;
+static int s_frames_since_check = 0;
+static int s_adaptive_skip_enabled = 0;
+
 void CheckFrameRate(void)
 {
-	if(UseFrameSkip)                                      // skipping mode?
+	// Modo adaptativo Xbox 360: se FPS muito acima do target, limita
+	// Se FPS abaixo do target, ativa frame skip automatico
+	if(UseFrameLimit && iFrameLimit==2)  // Auto mode
+	{
+		unsigned long now = timeGetTime();
+		s_frames_since_check++;
+		
+		// A cada 1 segundo (100000 ticks), avalia performance
+		if((now - s_adaptive_lastcheck) >= 100000)
+		{
+			float current_fps = (float)s_frames_since_check;
+			float target_fps = PSXDisplay.PAL ? 50.0f : 60.0f;
+			
+			// Se FPS > 120% do target (ex: 80 FPS em NTSC), precisa limitar mais
+			if(current_fps > (target_fps * 1.2f))
+			{
+				// FPS muito alto - frame limiter trabalhando bem
+				s_adaptive_skip_enabled = 0;
+			}
+			// Se FPS < 90% do target (ex: 45 FPS em NTSC), ativa frame skip
+			else if(current_fps < (target_fps * 0.9f))
+			{
+				s_adaptive_skip_enabled = 1;
+			}
+			
+			s_frames_since_check = 0;
+			s_adaptive_lastcheck = now;
+		}
+	}
+	
+	if(UseFrameSkip || s_adaptive_skip_enabled)           // skipping mode?
 	{
 		if(!(dwActFixes&0x80))                              // not old skipping mode?
 		{
@@ -72,48 +107,54 @@ unsigned long timeGetTime()
 	return tv.tv_sec * 100000 + tv.tv_usec/10;            // to do that, but at least it works
 }
 
+// Otimizado para Xbox 360 - Remove busy-wait, usa timing eficiente
 void FrameCap (void)
 {
 	static unsigned long curticks, lastticks, _ticks_since_last_update;
 	static unsigned int TicksToWait = 0;
 	int overslept=0, tickstogo=0;
-	BOOL Waiting = TRUE;
+	
+	curticks = timeGetTime();
+	_ticks_since_last_update = curticks - lastticks;
 
+	// Se já passou do tempo alvo, calcula oversleep para compensar no próximo frame
+	if((_ticks_since_last_update > TicksToWait) || (curticks < lastticks))
 	{
+		lastticks = curticks;
+		overslept = _ticks_since_last_update - TicksToWait;
+		if((_ticks_since_last_update - TicksToWait) > dwFrameRateTicks)
+			TicksToWait = 0;
+		else
+			TicksToWait = dwFrameRateTicks - overslept;
+		return;  // Frame atrasado, não espera
+	}
+	
+	// Precisa esperar - usa Sleep eficiente ao invés de busy-wait
+	tickstogo = TicksToWait - _ticks_since_last_update;
+	
+	if(tickstogo > 0)
+	{
+		// Xbox 360: Sleep com granularidade menor (1ms ao invés de só quando >200)
+		// Isso libera a CPU para outros threads (SPU, GPU, etc)
+		unsigned int sleepTime = (tickstogo >= 100) ? (tickstogo / 100) : 1;
+		Sleep(sleepTime);
+		
+		// Atualiza tempo após sleep
 		curticks = timeGetTime();
 		_ticks_since_last_update = curticks - lastticks;
-
-		if((_ticks_since_last_update > TicksToWait) ||
-			(curticks <lastticks))
+		
+		// Se ainda precisa esperar um pouco, faz busy-wait curto (microssegundos)
+		while(_ticks_since_last_update < TicksToWait)
 		{
-			lastticks = curticks;
-			overslept = _ticks_since_last_update - TicksToWait;
-			if((_ticks_since_last_update-TicksToWait) > dwFrameRateTicks)
-				TicksToWait=0;
-			else
-				TicksToWait=dwFrameRateTicks - overslept;
-		}
-		else
-		{
-			while (Waiting)
-			{
-				curticks = timeGetTime();
-				_ticks_since_last_update = curticks - lastticks;
-				tickstogo = TicksToWait - _ticks_since_last_update;
-				if ((_ticks_since_last_update > TicksToWait) ||
-					(curticks < lastticks) || tickstogo < overslept)
-				{
-					Waiting = FALSE;
-					lastticks = curticks;
-					overslept = _ticks_since_last_update - TicksToWait;
-					TicksToWait = dwFrameRateTicks - overslept;
-					return;
-				}
-				if (tickstogo >= 200 && !(dwActFixes&16))
-					Sleep((tickstogo*10 - 200)/1000);
-			}
+			curticks = timeGetTime();
+			_ticks_since_last_update = curticks - lastticks;
 		}
 	}
+	
+	lastticks = timeGetTime();
+	overslept = _ticks_since_last_update - TicksToWait;
+	if(overslept < 0) overslept = 0;
+	TicksToWait = dwFrameRateTicks - overslept;
 }
 
 #define MAXSKIP 120

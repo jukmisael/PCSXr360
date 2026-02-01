@@ -265,7 +265,7 @@ void LoadSettings() {
 	xboxConfig.UseDynarec         = ini.GetLongValue("pcsx", "UseDynarec",         1);  // Dynarec ativo por padrao
 	xboxConfig.UseThreadedGpu     = ini.GetLongValue("pcsx", "UseThreadedGpu",     0);
 	xboxConfig.UseSpuIrq          = ini.GetLongValue("pcsx", "UseSpuIrq",          0);
-	xboxConfig.UseFrameLimiter    = ini.GetLongValue("pcsx", "UseFrameLimiter",    0);
+	xboxConfig.UseFrameLimiter    = ini.GetLongValue("pcsx", "UseFrameLimiter",    1);  // Frame limiter ativo por padrao
 	xboxConfig.UseParasiteEveFix  = ini.GetLongValue("pcsx", "UseParasiteEveFix",  0);
 	xboxConfig.UseDarkForcesFix   = ini.GetLongValue("pcsx", "UseDarkForcesFix",   0);
 	xboxConfig.UseSlowBoot        = ini.GetLongValue("pcsx", "UseSlowBoot",        0);

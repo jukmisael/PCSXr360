@@ -62,7 +62,8 @@ void ReadConfig(void)
  iMaintainAspect=0;
  UseFrameSkip=0;
  bInitCap = TRUE ;
- iFrameLimit=2;
+ iFrameLimit=2;               // Auto-detect PAL/NTSC
+ UseFrameLimit=1;             // ATIVADO por padrao para Xbox 360
  fFrameRate=200.0f;
  dwCfgFixes=darkforcesfix;
  iUseNoStretchBlt=0;
