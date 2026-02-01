@@ -54,17 +54,17 @@ void AboutDlgProc(void)
 
 void ReadConfig(void)
 {
- // defaults
- iResX=640;iResY=480;
- iWinSize=MAKELONG(320,240);
- iColDepth=16;
- iWindowMode=0;
- iMaintainAspect=0;
- UseFrameSkip=0;
- bInitCap = TRUE ;
- iFrameLimit=2;               // Auto-detect PAL/NTSC
- UseFrameLimit=1;             // ATIVADO por padrao para Xbox 360
- fFrameRate=200.0f;
+ // defaults (NÃO setar UseFrameLimit/UseFrameSkip aqui - são gerenciados pelo gameprofile)
+  iResX=640;iResY=480;
+  iWinSize=MAKELONG(320,240);
+  iColDepth=16;
+  iWindowMode=0;
+  iMaintainAspect=0;
+  // UseFrameSkip e UseFrameLimit são gerenciados pelo sistema de gameprofile
+  // Não inicializar aqui para não sobrescrever configurações do usuário
+  bInitCap = TRUE ;
+  iFrameLimit=2;               // Auto-detect PAL/NTSC
+  fFrameRate=200.0f;
  dwCfgFixes=darkforcesfix;
  iUseNoStretchBlt=0;
  iUseDither=0;

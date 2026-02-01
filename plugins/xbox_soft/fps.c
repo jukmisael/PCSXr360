@@ -43,7 +43,7 @@ float  fps_cur  = 0;
 // Estatisticas para frame limiter adaptativo (Xbox 360)
 static unsigned long s_adaptive_lastcheck = 0;
 static int s_frames_since_check = 0;
-static int s_adaptive_skip_enabled = 0;
+int s_adaptive_skip_enabled = 0;  // Global para acesso externo
 
 void CheckFrameRate(void)
 {

@@ -82,10 +82,11 @@ public:
 	bool ShutdownRequested;
 	bool ResetRequested;
 	bool OsdMenuRequested;
-	bool UseDynarec;
+	bool UseInterpreter;  // 0 = Dynarec (padrão), 1 = Interpreter (Legacy)
 	bool UseSpuIrq;
 	bool UseThreadedGpu;
-	bool UseFrameLimiter;
+	bool DisableFrameLimiter;
+	bool DisableFrameSkip;
 	bool UseParasiteEveFix;
 	int  UseDarkForcesFix; 
 	bool runBios;

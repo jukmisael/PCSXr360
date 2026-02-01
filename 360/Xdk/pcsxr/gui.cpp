@@ -83,8 +83,9 @@ protected:
 
 	CXuiCheckbox DynarecCbox;
 	CXuiCheckbox GpuThCbox;
+	CXuiCheckbox DisableFrameLimitCbox;
+	CXuiCheckbox DisableFrameSkipCbox;
 	CXuiCheckbox SpuIrqCbox;
-	CXuiCheckbox FrameLimitCbox;
 	CXuiCheckbox ParasiteEveFixCbox;
 	CXuiCheckbox DarkForcesFixCbox;	
 	CXuiCheckbox slowbootCbox;
@@ -128,7 +129,8 @@ protected:
 		GetChildById( L"DynarecCbox",        &DynarecCbox );
 		GetChildById( L"GpuThCbox",          &GpuThCbox );
 		GetChildById( L"SpuIrqCbox",         &SpuIrqCbox );
-		GetChildById( L"FrameLimitCbox",     &FrameLimitCbox );
+		GetChildById( L"DisableFrameLimitCbox", &DisableFrameLimitCbox );
+		GetChildById( L"DisableFrameSkipCbox",  &DisableFrameSkipCbox );
 		GetChildById( L"ParasiteEveFixCbox", &ParasiteEveFixCbox );
         GetChildById( L"DarkForcesFixCbox",  &DarkForcesFixCbox );
 		GetChildById( L"slowbootCbox",       &slowbootCbox );
@@ -165,10 +167,11 @@ protected:
 
 
 		// Init values from xbox config
-		DynarecCbox.SetCheck(!xboxConfig.UseDynarec);  // Invertido: checkbox marcado = Interpreter
+		DynarecCbox.SetCheck(xboxConfig.UseInterpreter);  // Checked = Interpreter (Legacy), Unchecked = Dynarec (padrão)
 		GpuThCbox.SetCheck(xboxConfig.UseThreadedGpu);
 		SpuIrqCbox.SetCheck(xboxConfig.UseSpuIrq);
-		FrameLimitCbox.SetCheck(xboxConfig.UseFrameLimiter);
+		DisableFrameLimitCbox.SetCheck(xboxConfig.DisableFrameLimiter);
+		DisableFrameSkipCbox.SetCheck(xboxConfig.DisableFrameSkip);
 		ParasiteEveFixCbox.SetCheck(xboxConfig.UseParasiteEveFix);
 		DarkForcesFixCbox.SetCheck(xboxConfig.UseDarkForcesFix);
 		slowbootCbox.SetCheck(xboxConfig.UseSlowBoot);
@@ -237,7 +240,7 @@ protected:
 		}
 
 		if (hObjPressed == DynarecCbox) {
-			xboxConfig.UseDynarec = !DynarecCbox.IsChecked();  // Invertido: unchecked = Dynarec (padrao)
+			xboxConfig.UseInterpreter = DynarecCbox.IsChecked();  // Checked = Interpreter, Unchecked = Dynarec
 		}
 
 		if (hObjPressed == GpuThCbox) {
@@ -248,8 +251,16 @@ protected:
 			xboxConfig.UseSpuIrq = SpuIrqCbox.IsChecked();
 		}
 
-		if (hObjPressed == FrameLimitCbox) {
-			xboxConfig.UseFrameLimiter = FrameLimitCbox.IsChecked();
+		if (hObjPressed == DisableFrameLimitCbox) {
+			xboxConfig.DisableFrameLimiter = DisableFrameLimitCbox.IsChecked();
+			OutputDebugStringA("[Menu] DisableFrameLimitCbox alterado: ");
+			OutputDebugStringA(xboxConfig.DisableFrameLimiter ? "DESATIVADO\n" : "ATIVO\n");
+		}
+
+		if (hObjPressed == DisableFrameSkipCbox) {
+			xboxConfig.DisableFrameSkip = DisableFrameSkipCbox.IsChecked();
+			OutputDebugStringA("[Menu] DisableFrameSkipCbox alterado: ");
+			OutputDebugStringA(xboxConfig.DisableFrameSkip ? "DESATIVADO\n" : "ATIVO\n");
 		}
 
 		if (hObjPressed == ParasiteEveFixCbox) {
@@ -298,7 +309,8 @@ protected:
 			DynarecCbox.SetShow(FALSE);
 			GpuThCbox.SetShow(FALSE);
 			SpuIrqCbox.SetShow(FALSE);
-			FrameLimitCbox.SetShow(FALSE);
+			DisableFrameLimitCbox.SetShow(FALSE);
+			DisableFrameSkipCbox.SetShow(FALSE);
 			ParasiteEveFixCbox.SetShow(FALSE);
 			DarkForcesFixCbox.SetShow(FALSE);
 			slowbootCbox.SetShow(FALSE);
@@ -350,10 +362,11 @@ protected:
 			//Set checkbox with right configs from game profile  @Dreamboy 23/12/2016
 
 		    LinearFilterCbox.SetCheck(xboxConfig.UseLinearFilter);
-		    DynarecCbox.SetCheck(!xboxConfig.UseDynarec);  // Invertido
+		    DynarecCbox.SetCheck(xboxConfig.UseInterpreter);  // Checked = Interpreter
 		    GpuThCbox.SetCheck(xboxConfig.UseThreadedGpu);
 		    SpuIrqCbox.SetCheck(xboxConfig.UseSpuIrq);
-			FrameLimitCbox.SetCheck(xboxConfig.UseFrameLimiter);
+		DisableFrameLimitCbox.SetCheck(xboxConfig.DisableFrameLimiter);
+		DisableFrameSkipCbox.SetCheck(xboxConfig.DisableFrameSkip);
 			ParasiteEveFixCbox.SetCheck(xboxConfig.UseParasiteEveFix);
 			DarkForcesFixCbox.SetCheck(xboxConfig.UseDarkForcesFix);
 			slowbootCbox.SetCheck(xboxConfig.UseSlowBoot);//psx bios boot
@@ -370,7 +383,8 @@ protected:
 			DynarecCbox.SetShow(TRUE);         
 			GpuThCbox.SetShow(TRUE);           
 			SpuIrqCbox.SetShow(TRUE);          
-			FrameLimitCbox.SetShow(TRUE);      
+			DisableFrameLimitCbox.SetShow(TRUE);
+			DisableFrameSkipCbox.SetShow(TRUE);      
 			ParasiteEveFixCbox.SetShow(TRUE);  
 			DarkForcesFixCbox.SetShow(TRUE);   
 			slowbootCbox.SetShow(TRUE);		   
@@ -395,7 +409,8 @@ protected:
 			DynarecCbox.SetShow(FALSE);
 			GpuThCbox.SetShow(FALSE);
 			SpuIrqCbox.SetShow(FALSE);
-			FrameLimitCbox.SetShow(FALSE);
+			DisableFrameLimitCbox.SetShow(FALSE);
+			DisableFrameSkipCbox.SetShow(FALSE);
 			ParasiteEveFixCbox.SetShow(FALSE);
 			DarkForcesFixCbox.SetShow(FALSE);
 			slowbootCbox.SetShow(FALSE);
@@ -820,11 +835,8 @@ protected:
         xboxConfig.GamePath =  std::wstring(rompath.begin(),rompath.end());
 		xboxConfig.GameName = std::wstring(romName.begin(),romName.end());
 		
-		//todo LoadGameProfile startup Marco 2017
-		/*	ApplySettings("");
-			Sleep(1);
-			LoadSettings();
-			*/
+		// Carregar perfil do jogo ao selecionar (para popular os checkboxes no menu)
+		LoadSettings();
 		//------------------------------------
 
         bHandled = FALSE;

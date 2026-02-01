@@ -1,11 +1,14 @@
 #include "gui.h"
 #include <sys/types.h>
+#include <stdio.h>
+#include <stdarg.h>
 #include "psxcommon.h"
 #include "cdriso.h"
 #include "cdrom.h"
 #include "r3000a.h"
 #include "gpu.h"
 #include "../../../libpcsxcore/misc.h"
+#include "../../../libpcsxcore/cdrom.h"
 #include "sys\Mount.h"
 #include "simpleini\SimpleIni.h"
 #include "aurora.h"  // swizzy rom loading aurora dash
@@ -13,7 +16,37 @@
 #include <string>
 #include <xuiapp.h>
 
+// Incluir header do plugin GPU para acesso às variáveis de frame limiter
+extern "C" {
+#include "../../../plugins/xbox_soft/fps.h"
+}
+
 std::string gameprofile;
+
+// Debug log simples para gameprofile
+static FILE* g_debug_log = NULL;
+
+void DebugLog_Init() {
+    if (!g_debug_log) {
+        g_debug_log = fopen("game:\\debug_log.txt", "a");
+        if (g_debug_log) {
+            fprintf(g_debug_log, "\n=== Debug Log Iniciado ===\n");
+            fflush(g_debug_log);
+        }
+    }
+}
+
+void DebugLog(const char* fmt, ...) {
+    if (!g_debug_log) DebugLog_Init();
+    if (g_debug_log) {
+        va_list args;
+        va_start(args, fmt);
+        vfprintf(g_debug_log, fmt, args);
+        va_end(args);
+        fprintf(g_debug_log, "\n");
+        fflush(g_debug_log);
+    }
+}
 
 void RenderXui();
 HXUIOBJ hMainScene;
@@ -171,112 +204,217 @@ CSimpleIniA ini,debuginfo;
 
 bool slowboot;
 
-void ApplySettings(const char* path) {
+// Função auxiliar para obter ID do jogo (sempre usa nome do arquivo ISO para consistência)
+static void GetGameIdentifier(char* out_id, int max_len) {
+	// SEMPRE usar o nome do arquivo ISO (basename de GamePath)
+	// Isso garante consistência entre salvar (menu) e carregar (execução)
+	out_id[0] = '\0';
+	if (xboxConfig.GamePath.empty()) {
+		strcpy(out_id, "UNKNOWN");
+		return;
+	}
+	
+	// Converter wstring para string e extrair basename
+	std::string path;
+	get_string(xboxConfig.GamePath, path);
+	
+	// Encontrar última barra
+	size_t last_slash = path.find_last_of("\\/");
+	if (last_slash != std::string::npos) {
+		path = path.substr(last_slash + 1);
+	}
+	
+	// Remover extensão
+	size_t dot = path.find_last_of(".");
+	if (dot != std::string::npos) {
+		path = path.substr(0, dot);
+	}
+	
+	// Limpar caracteres inválidos para filename (substituir por _)
+	for (size_t i = 0; i < path.length(); i++) {
+		if (path[i] == ' ' || path[i] == '[' || path[i] == ']' || 
+		    path[i] == '(' || path[i] == ')' || path[i] == '&' ||
+		    path[i] == '@' || path[i] == '!' || path[i] == '#' ||
+		    path[i] == '%' || path[i] == '^' || path[i] == '*' ||
+		    path[i] == '?' || path[i] == '<' || path[i] == '>' ||
+		    path[i] == '|' || path[i] == '"' || path[i] == '\'') {
+			path[i] = '_';
+		}
+	}
+	
+	strncpy(out_id, path.c_str(), max_len-1);
+	out_id[max_len-1] = '\0';
+	
+	if (out_id[0] == '\0') {
+		strcpy(out_id, "UNKNOWN");
+	}
+}
 
-	Config.Cpu        = xboxConfig.UseDynarec ? CPU_DYNAREC : CPU_INTERPRETER;
+void SaveGameProfile(void) {
+	char profile_path[256];
+	char game_id[128];
+	
+	GetGameIdentifier(game_id, sizeof(game_id));
+	
+	// Criar diretório se não existir
+	CreateDirectoryA("game:\\gameprofile", NULL);
+	
+	// Usar ID do jogo como nome do arquivo
+	sprintf(profile_path, "game:\\gameprofile\\%s.txt", game_id);
+	
+	DebugLog("[SaveGameProfile] Salvando perfil: %s (ID=%s)", profile_path, game_id);
+	
+	FILE* fp = fopen(profile_path, "w");
+	if (!fp) {
+		DebugLog("[SaveGameProfile] ERRO: Não foi possível criar arquivo %s", profile_path);
+		return;
+	}
+	
+	// Salvar todas as configurações no formato key=value
+	fprintf(fp, "# PCSXr360 Game Profile\n");
+	fprintf(fp, "# Game ID: %s\n", game_id);
+	fprintf(fp, "UseInterpreter=%d\n", xboxConfig.UseInterpreter);
+	fprintf(fp, "UseThreadedGpu=%d\n", xboxConfig.UseThreadedGpu);
+	fprintf(fp, "UseSpuIrq=%d\n", xboxConfig.UseSpuIrq);
+	fprintf(fp, "DisableFrameLimiter=%d\n", xboxConfig.DisableFrameLimiter);
+	fprintf(fp, "DisableFrameSkip=%d\n", xboxConfig.DisableFrameSkip);
+	fprintf(fp, "UseParasiteEveFix=%d\n", xboxConfig.UseParasiteEveFix);
+	fprintf(fp, "UseDarkForcesFix=%d\n", xboxConfig.UseDarkForcesFix);
+	fprintf(fp, "UseSlowBoot=%d\n", xboxConfig.UseSlowBoot);
+	fprintf(fp, "UseLinearFilter=%d\n", xboxConfig.UseLinearFilter);
+	fprintf(fp, "UseCpuBias=%d\n", xboxConfig.UseCpuBias);
+	fprintf(fp, "UseTombRaider2Fix=%d\n", xboxConfig.UseTombRaider2Fix);
+	fprintf(fp, "UseFrontMission3Fix=%d\n", xboxConfig.UseFrontMission3Fix);
+	fprintf(fp, "Shader=%s\n", xboxConfig.Shaders);
+	
+	fclose(fp);
+	DebugLog("[SaveGameProfile] Perfil salvo com sucesso");
+}
+
+void LoadGameProfile(void) {
+	char profile_path[256];
+	char game_id[128];
+	
+	GetGameIdentifier(game_id, sizeof(game_id));
+	
+	// Usar ID do jogo como nome do arquivo
+	sprintf(profile_path, "game:\\gameprofile\\%s.txt", game_id);
+	
+	DebugLog("[LoadGameProfile] Carregando perfil: %s (ID=%s)", profile_path, game_id);
+	
+	FILE* fp = fopen(profile_path, "r");
+	if (!fp) {
+		DebugLog("[LoadGameProfile] AVISO: Perfil não encontrado para %s, usando defaults", game_id);
+		return;
+	}
+	
+	char line[512];
+	while (fgets(line, sizeof(line), fp)) {
+		// Remover newline
+		line[strcspn(line, "\n")] = 0;
+		
+		// Ignorar comentários e linhas vazias
+		if (line[0] == '#' || line[0] == '\0') continue;
+		
+		// Parse key=value
+		char* key = line;
+		char* value = strchr(line, '=');
+		if (!value) continue;
+		*value = '\0';
+		value++;
+		
+		// Carregar valores
+		if (strcmp(key, "UseInterpreter") == 0) xboxConfig.UseInterpreter = atoi(value);
+		// Compatibilidade com arquivos antigos (UseDynarec)
+		else if (strcmp(key, "UseDynarec") == 0) xboxConfig.UseInterpreter = !atoi(value);  // Invertido: UseDynarec=1 -> UseInterpreter=0
+		else if (strcmp(key, "UseThreadedGpu") == 0) xboxConfig.UseThreadedGpu = atoi(value);
+		else if (strcmp(key, "UseSpuIrq") == 0) xboxConfig.UseSpuIrq = atoi(value);
+		else if (strcmp(key, "DisableFrameLimiter") == 0) xboxConfig.DisableFrameLimiter = atoi(value);
+		else if (strcmp(key, "DisableFrameSkip") == 0) xboxConfig.DisableFrameSkip = atoi(value);
+		else if (strcmp(key, "UseParasiteEveFix") == 0) xboxConfig.UseParasiteEveFix = atoi(value);
+		else if (strcmp(key, "UseDarkForcesFix") == 0) xboxConfig.UseDarkForcesFix = atoi(value);
+		else if (strcmp(key, "UseSlowBoot") == 0) xboxConfig.UseSlowBoot = atoi(value);
+		else if (strcmp(key, "UseLinearFilter") == 0) xboxConfig.UseLinearFilter = atoi(value);
+		else if (strcmp(key, "UseCpuBias") == 0) xboxConfig.UseCpuBias = atoi(value);
+		else if (strcmp(key, "UseTombRaider2Fix") == 0) xboxConfig.UseTombRaider2Fix = atoi(value);
+		else if (strcmp(key, "UseFrontMission3Fix") == 0) xboxConfig.UseFrontMission3Fix = atoi(value);
+		else if (strcmp(key, "Shader") == 0) strcpy(xboxConfig.Shaders, value);
+	}
+	
+	fclose(fp);
+	DebugLog("[LoadGameProfile] Perfil carregado com sucesso");
+}
+
+void ApplySettings(const char* path) {
+	Config.Cpu        = xboxConfig.UseInterpreter ? CPU_INTERPRETER : CPU_DYNAREC;  // 0 = Dynarec (padrão), 1 = Interpreter
 	Config.RCntFix    = xboxConfig.UseParasiteEveFix;
 	spuirq            = xboxConfig.UseSpuIrq;
-	UseFrameLimit     = xboxConfig.UseFrameLimiter;
+	
+	// Frame Limiter: Invertido - unchecked = ativo (padrão), checked = desativado
+	DebugLog("[ApplySettings] DisableFrameLimiter=%d, DisableFrameSkip=%d", xboxConfig.DisableFrameLimiter, xboxConfig.DisableFrameSkip);
+	if (xboxConfig.DisableFrameLimiter) {
+		UseFrameLimit = 0;
+		iFrameLimit = 0;
+		DebugLog("[ApplySettings] FrameLimiter DESATIVADO (UseFrameLimit=0)");
+	} else {
+		UseFrameLimit = 1;
+		iFrameLimit = 2;
+		SetAutoFrameCap();
+		DebugLog("[ApplySettings] FrameLimiter ATIVADO (UseFrameLimit=1)");
+	}
+	
+	// Frame Skip: Invertido - unchecked = adaptativo (padrão), checked = desativado
+	if (xboxConfig.DisableFrameSkip) {
+		s_adaptive_skip_enabled = 0;
+		UseFrameSkip = 0;
+		DebugLog("[ApplySettings] FrameSkip DESATIVADO");
+	} else {
+		UseFrameSkip = 0;
+		DebugLog("[ApplySettings] FrameSkip ATIVO/Adaptativo");
+	}
+	
 	linearfilter      = xboxConfig.UseLinearFilter;
 	slowboot          = xboxConfig.UseSlowBoot;
 	tombraider2fix    = xboxConfig.UseTombRaider2Fix;
 	frontmission3fix  = xboxConfig.UseFrontMission3Fix;
 	darkforcesfix     = xboxConfig.UseDarkForcesFix;
 
-	if(xboxConfig.UseCpuBias)
-	{
-		Config.CpuBias = 3;}
-	else
-	{
-		Config.CpuBias = 2;} 
-
- 	ini.SetLongValue("pcsx", "UseDynarec",         xboxConfig.UseDynarec);
-	ini.SetLongValue("pcsx", "UseThreadedGpu",     xboxConfig.UseThreadedGpu);
-	ini.SetLongValue("pcsx", "UseSpuIrq",          xboxConfig.UseSpuIrq);
-	ini.SetLongValue("pcsx", "UseFrameLimiter",    xboxConfig.UseFrameLimiter);
-	ini.SetLongValue("pcsx", "UseParasiteEveFix",  xboxConfig.UseParasiteEveFix);
-	ini.SetLongValue("pcsx", "UseDarkForcesFix",   xboxConfig.UseDarkForcesFix);
-	ini.SetLongValue("pcsx", "UseSlowBoot",        xboxConfig.UseSlowBoot);
-	ini.SetLongValue("pcsx", "UseLinearFilter",    xboxConfig.UseLinearFilter);
-	ini.SetLongValue("pcsx", "UseCpuBias",         xboxConfig.UseCpuBias);
-	ini.SetLongValue("pcsx", "UseTombRaider2Fix",  xboxConfig.UseTombRaider2Fix);
-	ini.SetLongValue("pcsx", "UseFrontMission3Fix",xboxConfig.UseFrontMission3Fix);
-	
-	ini.SetValue("pcsx", "Shader", xboxConfig.Shaders);
-
-
-	ini.SetValue("pcsx", "IsoFolder",xboxConfig.IsoFolder);
-	ini.SetValue("pcsx", "Game2Boot",xboxConfig.Game2Boot);
-	
-	//debug propurses
-	ini.SetValue("debug","IDCover",xboxConfig.GameIDCover);
-	ini.SetValue("debug","GameID",xboxConfig.CurrentgameID);
-	ini.SetValue("debug","GameID",xboxConfig.CurrentgameIDFullPath);
-	 	/*
-	std::wstring wgame;
-    wgame = xboxConfig.GamePath;*/
-
-	 
-	get_string(xboxConfig.GamePath, gameprofile);
-
-
-
-    //Get basename of current game
-	gameprofile.erase(0, gameprofile.rfind('\\')+1);
-    gameprofile = "game:\\gameprofile\\"  + gameprofile;
-    gameprofile = gameprofile + ".ini";
-
-	ini.SaveFile(gameprofile.c_str());
-}
-
-//void LoadSettings(std::string gamepathprofile) {
-void LoadSettings() {
-
-    /* not neccessary atm it loads default values if doenst exist on .txt config file
-		
-		strcpy(Config.Bios, "SCPH1001.BIN");
-		strcpy(Config.BiosDir, "game:\\BIOS");
-		strcpy(Config.Mcd1,"game:\\memcards\\Memcard1.mcd");
-		strcpy(Config.Mcd2,"game:\\memcards\\Memcard2.mcd");
-        xboxConfig.saveStateDir = "game:\\states";
-    */                              
-    
-	ini.Reset(); // Reset settings to get right ones
-	
-	//TODO Test settings load with shaders and stuff from gameprifle with autoboot iso and isoload from aurora
-
-    //GamePath.c_str();
-
-	if (xboxConfig.GamePath.c_str() == L""){
-		std::string s = xboxConfig.Game2Boot;
-		std::wstring wsTmp(s.begin(), s.end());
-		xboxConfig.GamePath = wsTmp;
+	if(xboxConfig.UseCpuBias) {
+		Config.CpuBias = 3;
+	} else {
+		Config.CpuBias = 2;
 	}
 
-	get_string(xboxConfig.GamePath, gameprofile);
+	// Salvar perfil do jogo usando CdromId
+	SaveGameProfile();
+}
 
-    //Get basename of current game
-	gameprofile.erase(0, gameprofile.rfind('\\')+1);
-    gameprofile = "game:\\gameprofile\\" + gameprofile;
-    gameprofile = gameprofile + ".ini";
-    //Merge cfg file
-	ini.LoadFile(gameprofile.c_str());
-
-	xboxConfig.UseDynarec         = ini.GetLongValue("pcsx", "UseDynarec",         1);  // Dynarec ativo por padrao
-	xboxConfig.UseThreadedGpu     = ini.GetLongValue("pcsx", "UseThreadedGpu",     0);
-	xboxConfig.UseSpuIrq          = ini.GetLongValue("pcsx", "UseSpuIrq",          0);
-	xboxConfig.UseFrameLimiter    = ini.GetLongValue("pcsx", "UseFrameLimiter",    1);  // Frame limiter ativo por padrao
-	xboxConfig.UseParasiteEveFix  = ini.GetLongValue("pcsx", "UseParasiteEveFix",  0);
-	xboxConfig.UseDarkForcesFix   = ini.GetLongValue("pcsx", "UseDarkForcesFix",   0);
-	xboxConfig.UseSlowBoot        = ini.GetLongValue("pcsx", "UseSlowBoot",        0);
-	xboxConfig.UseLinearFilter    = ini.GetLongValue("pcsx", "UseLinearFilter",    0);
-	xboxConfig.UseCpuBias         = ini.GetLongValue("pcsx", "UseCpuBias",         0);
-	xboxConfig.UseTombRaider2Fix  = ini.GetLongValue("pcsx", "UseTombRaider2Fix",  0);
-	xboxConfig.UseFrontMission3Fix= ini.GetLongValue("pcsx", "UseFrontMission3Fix",0);
-
-	strcpy(xboxConfig.Shaders, strdup(ini.GetValue("pcsx", "Shader", "game:\\hlsl\\stock.cg")));
-	strcpy(xboxConfig.IsoFolder, strdup(ini.GetValue("pcsx", "IsoFolder", "game:\\ROMS\\")));
-	strcpy(xboxConfig.Game2Boot, strdup(ini.GetValue("pcsx", "Game2Boot", "game:")));
+void LoadSettings() {
+	DebugLog("[LoadSettings] Iniciando carregamento de perfil...");
+	
+	// Inicializar com valores padrão primeiro
+	xboxConfig.UseInterpreter = 0;       // 0 = Dynarec (padrão), 1 = Interpreter
+	xboxConfig.UseThreadedGpu = 0;       // Threaded GPU desativado
+	xboxConfig.UseSpuIrq = 0;            // SPU IRQ desativado
+	xboxConfig.DisableFrameLimiter = 0;  // Frame limiter ATIVO (0 = não desativa)
+	xboxConfig.DisableFrameSkip = 0;     // Frame skip ATIVO (0 = não desativa)
+	xboxConfig.UseParasiteEveFix = 0;    // Fix desativado
+	xboxConfig.UseDarkForcesFix = 0;     // Fix desativado
+	xboxConfig.UseSlowBoot = 0;          // Slow boot desativado
+	xboxConfig.UseLinearFilter = 0;      // Linear filter desativado
+	xboxConfig.UseCpuBias = 0;           // CPU bias padrão
+	xboxConfig.UseTombRaider2Fix = 0;    // Fix desativado
+	xboxConfig.UseFrontMission3Fix = 0;  // Fix desativado
+	strcpy(xboxConfig.Shaders, "game:\\hlsl\\stock.cg");  // Shader padrão
+	
+	DebugLog("[LoadSettings] Defaults definidos: FrameLimiter=%d, FrameSkip=%d", 
+		xboxConfig.DisableFrameLimiter, xboxConfig.DisableFrameSkip);
+	
+	// Carregar perfil do jogo (vai sobrescrever os defaults se existir)
+	LoadGameProfile();
+	
+	DebugLog("[LoadSettings] Finalizado: FrameLimiter=%d, FrameSkip=%d", 
+		xboxConfig.DisableFrameLimiter, xboxConfig.DisableFrameSkip);
 }
 
 
@@ -396,6 +534,12 @@ void DoPcsx(std::string sgame){
 
 	ret = CDR_open();
 	if (ret < 0) { SysMessage (_("Error Opening CDR Plugin")); return; }
+	
+	// Recarregar perfil após CDR_open para usar CdromId se disponível
+	LoadSettings();
+	// Reaplicar configurações carregadas aos variáveis de runtime
+	ApplySettings(NULL);
+	
 		ret = GPU_open(NULL);
 	if (ret < 0) { SysMessage (_("Error Opening GPU Plugin (%d)"), ret); return; }
 		ret = SPU_open(NULL);

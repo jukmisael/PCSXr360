@@ -18,7 +18,11 @@
 #ifndef _FPS_INTERNALS_H
 #define _FPS_INTERNALS_H
 
-void FrameCap(void); 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void FrameCap(void);
 void FrameSkip(void); 
 void calcfps(void);
 void PCFrameCap (void);
@@ -27,5 +31,15 @@ void SetAutoFrameCap(void);
 void SetFPSHandler(void);
 void InitFPS(void);
 void CheckFrameRate(void);
+
+// Variáveis para acesso externo (Xbox 360)
+extern int iFrameLimit;
+extern int UseFrameLimit;
+extern int UseFrameSkip;
+extern int s_adaptive_skip_enabled;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _FPS_INTERNALS_H
