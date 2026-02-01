@@ -1,3 +1,52 @@
+================================================================================
+v2.1.9 NIGHTLY BUILD
+================================================================================
+Data: Fevereiro 2026
+Base: PCSXr360 original por mLoaD + contribuições da comunidade
+
+NOVIDADES PRINCIPAIS:
+--------------------
+
+[ÁUDIO - Sistema Completo Rewrite]
+- Sistema de áudio completamente reescrito (migrado de peopsspu110 para dfsound)
+- Implementação de reverb minimalista e funcional (10% wet / 90% dry)
+- Correção de eco, chiado e duplicação de sons
+- Adicionado limiters de volume para prevenir estouro de áudio
+- Clamping no envelope ADSR para evitar picos de volume súbitos
+- Compatibilidade C89 para compilador Xbox 360
+
+[DESEMPENHO E FPS]
+- Implementação completa do sistema de controle de FPS
+- Frame limiter otimizado e ativado por padrão
+- Dynarec (recompilador dinâmico) como padrão para melhor performance
+- Profiler simplificado para análise de performance (LB+RB+BACK)
+- Sistema de sincronia aprimorado entre áudio e vídeo
+
+[INTERFACE E USABILIDADE]
+- README.md completamente reescrito e modernizado
+- Combinções de controle padronizadas:
+  * LB + RB + A + B + X + Y = Menu OSD / Sair do jogo
+  * LB + RB + BACK = Toggle profiler
+  * Right Stick Click = Sair para dashboard
+- Debug log agora é limpo automaticamente a cada abertura (evita arquivo gigante)
+- Criação automática da pasta profiling para logs de performance
+- Game profiles individuais por jogo mantidos
+
+[COMPATIBILIDADE]
+- Suporte a formatos: BIN/CUE, ISO, IMG
+- Integração Aurora/FSD mantida
+- Autoboot psx.iso funcional com gameprofile support
+- Suporte a shaders e filtros de imagem
+
+[DOCUMENTAÇÃO]
+- Changelog unificado (este arquivo)
+- README.md com instruções claras e badges
+- Wiki disponível no GitHub
+
+--------------------------------------------------------------------------------
+HISTÓRICO DE VERSÕES ANTERIORES (mLoaD e colaboradores):
+--------------------------------------------------------------------------------
+
 v2.1.1a PNG Fix
 - Remove .jpg format and Added .png format for all image files and covers
 mLoaD
@@ -181,5 +230,5 @@ Instructions:
 -Put all your games(bin,cue, cdd, img,etc) files on "games" folder. Don't use a separated folder for each game inside the "games" folder.
 - Make sure to make a game profile before launch a game, pressing Y button.
 - Make sure to load a game profile before launch the game pressing B button(the game must be highlighted). A message showing profile loaded and game name will appear.
-- Press “Back” Button to change the cdr plugin.
-- Deleting files from memory card: Just load the psx bios(.bin file) on bios folder. you'll see a black screen. Press “start “and “Back “ buttons to go to OSD menu. Reset the game(bios) and the psx bios will be loaded.
+- Press "Back" Button to change the cdr plugin.
+- Deleting files from memory card: Just load the psx bios(.bin file) on bios folder. you'll see a black screen. Press "start "and "Back " buttons to go to OSD menu. Reset the game(bios) and the psx bios will be loaded.

@@ -65,7 +65,6 @@ Cada jogo pode ter configurações individuais:
 - CPU Bias (underclock para performance)
 - Shaders personalizados
 - Configurações de áudio
-- Memory cards virtuais individuais
 
 ## 🐛 Debug
 
