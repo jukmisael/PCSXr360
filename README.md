@@ -1,6 +1,6 @@
 # PCSXr360
 
-[![Nightly](https://img.shields.io/badge/Version-Nightly-blue.svg)](https://github.com/mLoaDs/PCSXr360/releases)
+[![Nightly](https://img.shields.io/badge/Version-Nightly-blue.svg)](https://github.com/jukmisael/PCSXr360/releases/tag/nightly)
 [![Platform](https://img.shields.io/badge/Platform-Xbox%20360-green.svg)](https://www.xbox.com)
 [![License](https://img.shields.io/badge/License-GPLv2-yellow.svg)](LICENSE)
 
