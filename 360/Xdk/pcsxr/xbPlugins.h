@@ -82,59 +82,33 @@ char * NULL_SPUgetLibInfos(void);
 void NULL_SPUabout(void);
 long NULL_SPUfreeze(unsigned long ulFreezeMode,SPUFreeze_t *);
 
-/* SPU PEOPS 1.9 */
+/* SPU DFSOUND 1.7 */
 //dma.c
-unsigned short CALLBACK PEOPS_SPUreadDMA(void);
-void CALLBACK PEOPS_SPUreadDMAMem(unsigned short * pusPSXMem,int iSize);
-void CALLBACK PEOPS_SPUwriteDMA(unsigned short val);
-void CALLBACK PEOPS_SPUwriteDMAMem(unsigned short * pusPSXMem,int iSize);
-//PEOPSspu.c
-void CALLBACK PEOPS_SPUasync(unsigned long cycle);
-void CALLBACK PEOPS_SPUupdate(void);
-void CALLBACK PEOPS_SPUplayADPCMchannel(xa_decode_t *xap);
-long CALLBACK PEOPS_SPUinit(void);
-long PEOPS_SPUopen(void);
-void PEOPS_SPUsetConfigFile(char * pCfg);
-long CALLBACK PEOPS_SPUclose(void);
-long CALLBACK PEOPS_SPUshutdown(void);
-long CALLBACK PEOPS_SPUtest(void);
-long CALLBACK PEOPS_SPUconfigure(void);
-void CALLBACK PEOPS_SPUabout(void);
-void CALLBACK PEOPS_SPUregisterCallback(void (CALLBACK *callback)(void));
-void CALLBACK PEOPS_SPUregisterCDDAVolume(void (CALLBACK *CDDAVcallback)(unsigned short,unsigned short));
-void CALLBACK PEOPS_SPUplayCDDAchannel(short *pcm, int nbytes);
+unsigned short CALLBACK DFSOUND_SPUreadDMA(void);
+void CALLBACK DFSOUND_SPUreadDMAMem(unsigned short * pusPSXMem,int iSize);
+void CALLBACK DFSOUND_SPUwriteDMA(unsigned short val);
+void CALLBACK DFSOUND_SPUwriteDMAMem(unsigned short * pusPSXMem,int iSize);
+//spu.c
+void CALLBACK DFSOUND_SPUasync(unsigned long cycle);
+void CALLBACK DFSOUND_SPUupdate(void);
+void CALLBACK DFSOUND_SPUplayADPCMchannel(xa_decode_t *xap);
+long CALLBACK DFSOUND_SPUinit(void);
+long DFSOUND_SPUopen(void);
+void DFSOUND_SPUsetConfigFile(char * pCfg);
+long CALLBACK DFSOUND_SPUclose(void);
+long CALLBACK DFSOUND_SPUshutdown(void);
+long CALLBACK DFSOUND_SPUtest(void);
+long CALLBACK DFSOUND_SPUconfigure(void);
+void CALLBACK DFSOUND_SPUabout(void);
+void CALLBACK DFSOUND_SPUregisterCallback(void (CALLBACK *callback)(void));
+void CALLBACK DFSOUND_SPUregisterCDDAVolume(void (CALLBACK *CDDAVcallback)(unsigned short,unsigned short));
+void CALLBACK DFSOUND_SPUplayCDDAchannel(short *pcm, int nbytes);
 //registers.c
-void CALLBACK PEOPS_SPUwriteRegister(unsigned long reg, unsigned short val);
-unsigned short CALLBACK PEOPS_SPUreadRegister(unsigned long reg);
+void CALLBACK DFSOUND_SPUwriteRegister(unsigned long reg, unsigned short val);
+unsigned short CALLBACK DFSOUND_SPUreadRegister(unsigned long reg);
 //freeze.c
-long CALLBACK PEOPS_SPUfreeze(unsigned long ulFreezeMode,SPUFreeze_t * pF);
+long CALLBACK DFSOUND_SPUfreeze(unsigned long ulFreezeMode,SPUFreeze_t * pF);
 
-
-/* SPU PEOPS 1.9 */
-//dma.c
-unsigned short CALLBACK PEOPS110_SPUreadDMA(void);
-void CALLBACK PEOPS110_SPUreadDMAMem(unsigned short * pusPSXMem,int iSize);
-void CALLBACK PEOPS110_SPUwriteDMA(unsigned short val);
-void CALLBACK PEOPS110_SPUwriteDMAMem(unsigned short * pusPSXMem,int iSize);
-//PEOPSspu.c
-void CALLBACK PEOPS110_SPUasync(unsigned long cycle);
-void CALLBACK PEOPS110_SPUupdate(void);
-void CALLBACK PEOPS110_SPUplayADPCMchannel(xa_decode_t *xap);
-long CALLBACK PEOPS110_SPUinit(void);
-long PEOPS110_SPUopen(void);
-void PEOPS110_SPUsetConfigFile(char * pCfg);
-long CALLBACK PEOPS110_SPUclose(void);
-long CALLBACK PEOPS110_SPUshutdown(void);
-long CALLBACK PEOPS110_SPUtest(void);
-long CALLBACK PEOPS110_SPUconfigure(void);
-void CALLBACK PEOPS110_SPUabout(void);
-void CALLBACK PEOPS110_SPUregisterCallback(void (CALLBACK *callback)(void));
-void CALLBACK PEOPS110_SPUregisterCDDAVolume(void (CALLBACK *CDDAVcallback)(unsigned short,unsigned short));
-//registers.c
-void CALLBACK PEOPS110_SPUwriteRegister(unsigned long reg, unsigned short val);
-unsigned short CALLBACK PEOPS110_SPUreadRegister(unsigned long reg);
-//freeze.c
-long CALLBACK PEOPS110_SPUfreeze(unsigned long ulFreezeMode,SPUFreeze_t * pF);
 
 /* CDR */
 long ISOopen(void);
@@ -312,91 +286,50 @@ HW_GPUvBlank}, \
 	      NULL_SPUregisterCDDAVolume} \
 	       } }
 
-#define SPU_PEOPS_PLUGIN \
+#define SPU_DFSOUND_PLUGIN \
 	{ "SPU",      \
 	  19,         \
 	  { { "SPUinit",  \
-	      PEOPS_SPUinit }, \
+	      DFSOUND_SPUinit }, \
 	    { "SPUshutdown",	\
-	      PEOPS_SPUshutdown}, \
+	      DFSOUND_SPUshutdown}, \
 	    { "SPUopen", \
-	      PEOPS_SPUopen}, \
+	      DFSOUND_SPUopen}, \
 	    { "SPUclose", \
-	      PEOPS_SPUclose}, \
+	      DFSOUND_SPUclose}, \
 	    { "SPUconfigure", \
-	      PEOPS_SPUconfigure}, \
+	      DFSOUND_SPUconfigure}, \
 	    { "SPUabout", \
-	      PEOPS_SPUabout}, \
+	      DFSOUND_SPUabout}, \
 	    { "SPUtest", \
-	      PEOPS_SPUtest}, \
+	      DFSOUND_SPUtest}, \
 	    { "SPUwriteRegister", \
-	      PEOPS_SPUwriteRegister}, \
+	      DFSOUND_SPUwriteRegister}, \
 	    { "SPUreadRegister", \
-	      PEOPS_SPUreadRegister}, \
+	      DFSOUND_SPUreadRegister}, \
 	    { "SPUwriteDMA", \
-	      PEOPS_SPUwriteDMA}, \
+	      DFSOUND_SPUwriteDMA}, \
 	    { "SPUreadDMA", \
-	      PEOPS_SPUreadDMA}, \
+	      DFSOUND_SPUreadDMA}, \
 	    { "SPUwriteDMAMem", \
-	      PEOPS_SPUwriteDMAMem}, \
+	      DFSOUND_SPUwriteDMAMem}, \
 	    { "SPUreadDMAMem", \
-	      PEOPS_SPUreadDMAMem}, \
+	      DFSOUND_SPUreadDMAMem}, \
 	    { "SPUplayADPCMchannel", \
-	      PEOPS_SPUplayADPCMchannel}, \
+	      DFSOUND_SPUplayADPCMchannel}, \
 	    { "SPUfreeze", \
-	      PEOPS_SPUfreeze}, \
+	      DFSOUND_SPUfreeze}, \
 	    { "SPUregisterCallback", \
-	      PEOPS_SPUregisterCallback}, \
+	      DFSOUND_SPUregisterCallback}, \
 	    { "SPUregisterCDDAVolume", \
-	      PEOPS_SPUregisterCDDAVolume}, \
+	      DFSOUND_SPUregisterCDDAVolume}, \
 		{ "SPUplayCDDAchannel", \
-	      PEOPS_SPUplayCDDAchannel}, \
+	      DFSOUND_SPUplayCDDAchannel}, \
 	    { "SPUasync", \
-	      PEOPS_SPUasync} \
+	      DFSOUND_SPUasync} \
 	       } }
       
-#if 0
-#define SPU_PEOPS_PLUGIN \
-	{ "SPU",      \
-	  18,         \
-	  { { "SPUinit",  \
-	      PEOPS110_SPUinit }, \
-	    { "SPUshutdown",	\
-	      PEOPS110_SPUshutdown}, \
-	    { "SPUopen", \
-	      PEOPS110_SPUopen}, \
-	    { "SPUclose", \
-	      PEOPS110_SPUclose}, \
-	    { "SPUconfigure", \
-	      PEOPS110_SPUconfigure}, \
-	    { "SPUabout", \
-	      PEOPS110_SPUabout}, \
-	    { "SPUtest", \
-	      PEOPS110_SPUtest}, \
-	    { "SPUwriteRegister", \
-	      PEOPS110_SPUwriteRegister}, \
-	    { "SPUreadRegister", \
-	      PEOPS110_SPUreadRegister}, \
-	    { "SPUwriteDMA", \
-	      PEOPS110_SPUwriteDMA}, \
-	    { "SPUreadDMA", \
-	      PEOPS110_SPUreadDMA}, \
-	    { "SPUwriteDMAMem", \
-	      PEOPS110_SPUwriteDMAMem}, \
-	    { "SPUreadDMAMem", \
-	      PEOPS110_SPUreadDMAMem}, \
-	    { "SPUplayADPCMchannel", \
-	      PEOPS110_SPUplayADPCMchannel}, \
-	    { "SPUfreeze", \
-	      PEOPS110_SPUfreeze}, \
-	    { "SPUregisterCallback", \
-	      PEOPS110_SPUregisterCallback}, \
-	    { "SPUregisterCDDAVolume", \
-	      PEOPS110_SPUregisterCDDAVolume}, \
-	    { "SPUasync", \
-	      PEOPS110_SPUasync} \
-	       } }
-#endif
+// Note: PEOPS110_SPU* functions removed - using DFSOUND instead
 
 #define GPU_NULL_PLUGIN \
 	{ "GPU",      \
@@ -481,7 +414,7 @@ GPUvBlank
 #define PLUGIN_SLOT_1 PAD1_PLUGIN
 #define PLUGIN_SLOT_2 PAD2_PLUGIN
 #define PLUGIN_SLOT_3 EMPTY_PLUGIN//CDR_PLUGIN
-#define PLUGIN_SLOT_4 SPU_PEOPS_PLUGIN
+#define PLUGIN_SLOT_4 SPU_DFSOUND_PLUGIN
 #define PLUGIN_SLOT_5 GPU_PEOPS_PLUGIN
 #define PLUGIN_SLOT_6 EMPTY_PLUGIN
 #define PLUGIN_SLOT_7 EMPTY_PLUGIN

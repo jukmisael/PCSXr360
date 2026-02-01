@@ -1346,6 +1346,9 @@ void RemoveStreams(void)
 // INIT/EXIT STUFF
 
 // SPUINIT: this func will be called first by the main emu
+// DFSOUND Audio Plugin - SPU Core
+// This is the DFSOUND audio implementation, not PEOPS.
+
 long CALLBACK SPUinit(void)
 {
  spuMemC = (unsigned char *)spuMem;                    // just small setup

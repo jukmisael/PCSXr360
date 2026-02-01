@@ -51,38 +51,42 @@ extern int CLAMP16(int x);
 #define MAXCHAN     24
 
 
-// ~ 1 ms of data - somewhat slower than Eternal
+// ~ 1 ms of data - somewhat slower than Eternal (conservative)
 //#define NSSIZE 45
 //#define INTERVAL_TIME 1000
 
-// ~ 0.5 ms of data - roughly Eternal maybe
-//#define NSSIZE 23
-//#define INTERVAL_TIME 2000
+// ~ 0.5 ms of data - balanced performance and latency (recommended)
+#define NSSIZE 23
+#define INTERVAL_TIME 2000
 
 // ~ 0.25 ms of data - seems a little bad..?
 //#define NSSIZE 12
 //#define INTERVAL_TIME 4000
 
-#define NSSIZE 10
+// Old Xbox 360 setting (too small, causes glitches)
+//#define NSSIZE 10
+
 #define APU_CYCLES_UPDATE NSSIZE
 
 
-// update times
+// update times - latency in ms
 #if 0
-// PEOPS DSound 1.09a - good sound cards
+// Low latency for good sound cards
 #define LATENCY 10
-#elif defined (_WINDOWS)
-// work on most cards
+#elif defined(_XBOX)
+// Xbox 360 optimized latency
+#define LATENCY 20
+#elif defined(_WINDOWS)
+// Standard Windows latency
 #define LATENCY 25
 #else
-// work on most cards
+// Default for other platforms
 #define LATENCY 25
 #endif
 
 
-// make sure this is bigger than cpu action - no glitchy
-#define INTERVAL_TIME 4500
-
+// Note: INTERVAL_TIME is now defined above with NSSIZE
+// to ensure they stay synchronized (INTERVAL_TIME = NSSIZE * ~87)
 
 #define CPU_CLOCK 33868800
 

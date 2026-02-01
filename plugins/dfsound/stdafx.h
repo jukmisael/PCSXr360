@@ -86,28 +86,30 @@
 
 #include "psemuxa.h"
 
+// NOTE: These DFSOUND_* prefixes are for the DFSOUND audio plugin.
+// The old PEOPS_* name was kept historically but this is DFSOUND, not PEOPS.
 #ifdef _XBOX
-#define SPUreadDMA				PEOPS_SPUreadDMA
-#define SPUreadDMAMem			PEOPS_SPUreadDMAMem
-#define SPUwriteDMA				PEOPS_SPUwriteDMA
-#define SPUwriteDMAMem			PEOPS_SPUwriteDMAMem
-#define SPUasync				PEOPS_SPUasync
-#define SPUupdate				PEOPS_SPUupdate
-#define SPUplayADPCMchannel		PEOPS_SPUplayADPCMchannel
-#define SPUinit					PEOPS_SPUinit
-#define SPUopen					PEOPS_SPUopen
-#define SPUsetConfigFile		PEOPS_SPUsetConfigFile
-#define SPUclose				PEOPS_SPUclose
-#define SPUshutdown				PEOPS_SPUshutdown
-#define SPUtest					PEOPS_SPUtest
-#define SPUconfigure			PEOPS_SPUconfigure
-#define SPUabout				PEOPS_SPUabout
-#define SPUregisterCallback		PEOPS_SPUregisterCallback
-#define SPUregisterCDDAVolume	PEOPS_SPUregisterCDDAVolume
-#define SPUplayCDDAchannel		PEOPS_SPUplayCDDAchannel
-#define SPUwriteRegister		PEOPS_SPUwriteRegister
-#define SPUreadRegister			PEOPS_SPUreadRegister
-#define SPUfreeze				PEOPS_SPUfreeze
+#define SPUreadDMA				DFSOUND_SPUreadDMA
+#define SPUreadDMAMem			DFSOUND_SPUreadDMAMem
+#define SPUwriteDMA				DFSOUND_SPUwriteDMA
+#define SPUwriteDMAMem			DFSOUND_SPUwriteDMAMem
+#define SPUasync				DFSOUND_SPUasync
+#define SPUupdate				DFSOUND_SPUupdate
+#define SPUplayADPCMchannel		DFSOUND_SPUplayADPCMchannel
+#define SPUinit					DFSOUND_SPUinit
+#define SPUopen					DFSOUND_SPUopen
+#define SPUsetConfigFile		DFSOUND_SPUsetConfigFile
+#define SPUclose				DFSOUND_SPUclose
+#define SPUshutdown				DFSOUND_SPUshutdown
+#define SPUtest					DFSOUND_SPUtest
+#define SPUconfigure			DFSOUND_SPUconfigure
+#define SPUabout				DFSOUND_SPUabout
+#define SPUregisterCallback		DFSOUND_SPUregisterCallback
+#define SPUregisterCDDAVolume	DFSOUND_SPUregisterCDDAVolume
+#define SPUplayCDDAchannel		DFSOUND_SPUplayCDDAchannel
+#define SPUwriteRegister		DFSOUND_SPUwriteRegister
+#define SPUreadRegister			DFSOUND_SPUreadRegister
+#define SPUfreeze				DFSOUND_SPUfreeze
 
 #define ReadConfig				SPUReadConfig
 #define ReadConfigFile			SPUReadConfigFile
