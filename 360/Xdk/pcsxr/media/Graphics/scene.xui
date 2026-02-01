@@ -1775,6 +1775,18 @@
 <InterItemSpacing>0.000000,10.000000,0.000000</InterItemSpacing>
 </Properties>
 </XuiListItem>
+<XuiListItem>
+<Properties>
+<Id>control_ListItem</Id>
+<Width>226.000000</Width>
+<Height>45.000000</Height>
+<Position>7.000000,22.000000,0.000000</Position>
+<Anchor>5</Anchor>
+<Show>false</Show>
+<Visual>XuiButton</Visual>
+<InterItemSpacing>0.000000,10.000000,0.000000</InterItemSpacing>
+</Properties>
+</XuiListItem>
 </XuiList>
 <XuiLabel>
 <Properties>
@@ -4034,6 +4046,18 @@ Pal
 <InterItemSpacing>0.000000,10.000000,0.000000</InterItemSpacing>
 </Properties>
 </XuiListItem>
+<XuiListItem>
+<Properties>
+<Id>control_ListItem</Id>
+<Width>226.000000</Width>
+<Height>45.000000</Height>
+<Position>7.000000,22.000000,0.000000</Position>
+<Anchor>5</Anchor>
+<Show>false</Show>
+<Visual>XuiButton</Visual>
+<InterItemSpacing>0.000000,10.000000,0.000000</InterItemSpacing>
+</Properties>
+</XuiListItem>
 </XuiList>
 <XuiNavButton>
 <Properties>
@@ -4189,7 +4213,7 @@ Pal
 <Show>false</Show>
 <NavUp>DisableFrameSkipCbox</NavUp>
 <NavDown>ParasiteEveFixCbox</NavDown>
-<Text>Use Spu IRQ</Text>
+<Text>Disable SPU IRQ</Text>
 </Properties>
 </XuiCheckbox>
 <XuiCheckbox>
@@ -4242,19 +4266,6 @@ Pal
 </XuiCheckbox>
 <XuiCheckbox>
 <Properties>
-<Id>LinearFilterCbox</Id>
-<Width>400.000000</Width>
-<Height>40.000000</Height>
-<Position>440.800049,97.100006,0.000000</Position>
-<Show>false</Show>
-<Visual>XuiCheckbox</Visual>
-<NavUp>btnSaveProfile</NavUp>
-<NavDown>DynarecCbox</NavDown>
-<Text>Use Linear Filter</Text>
-</Properties>
-</XuiCheckbox>
-<XuiCheckbox>
-<Properties>
 <Id>cpubiasCbox</Id>
 <Width>400.000000</Width>
 <Height>40.000000</Height>
@@ -4287,6 +4298,19 @@ Pal
 <NavUp>FrontMissionCbox</NavUp>
 <NavDown>slowbootCbox</NavDown>
 <Text>Tomb Raider II fix</Text>
+</Properties>
+</XuiCheckbox>
+<XuiCheckbox>
+<Properties>
+<Id>LinearFilterCbox</Id>
+<Width>400.000000</Width>
+<Height>40.000000</Height>
+<Position>440.800049,97.100006,0.000000</Position>
+<Show>false</Show>
+<Visual>XuiCheckbox</Visual>
+<NavUp>btnSaveProfile</NavUp>
+<NavDown>DynarecCbox</NavDown>
+<Text>Use Linear Filter</Text>
 </Properties>
 </XuiCheckbox>
 </XuiScene>

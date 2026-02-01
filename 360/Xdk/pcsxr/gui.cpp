@@ -169,7 +169,7 @@ protected:
 		// Init values from xbox config
 		DynarecCbox.SetCheck(xboxConfig.UseInterpreter);  // Checked = Interpreter (Legacy), Unchecked = Dynarec (padrão)
 		GpuThCbox.SetCheck(xboxConfig.UseThreadedGpu);
-		SpuIrqCbox.SetCheck(xboxConfig.UseSpuIrq);
+		SpuIrqCbox.SetCheck(xboxConfig.DisableSpuIrq);  // Checked = Disable IRQ OFF, Unchecked = IRQ ON (default)
 		DisableFrameLimitCbox.SetCheck(xboxConfig.DisableFrameLimiter);
 		DisableFrameSkipCbox.SetCheck(xboxConfig.DisableFrameSkip);
 		ParasiteEveFixCbox.SetCheck(xboxConfig.UseParasiteEveFix);
@@ -248,7 +248,7 @@ protected:
 		}
 
 		if (hObjPressed == SpuIrqCbox) {
-			xboxConfig.UseSpuIrq = SpuIrqCbox.IsChecked();
+			xboxConfig.DisableSpuIrq = SpuIrqCbox.IsChecked();  // Direct logic: checked = disable
 		}
 
 		if (hObjPressed == DisableFrameLimitCbox) {
@@ -364,7 +364,7 @@ protected:
 		    LinearFilterCbox.SetCheck(xboxConfig.UseLinearFilter);
 		    DynarecCbox.SetCheck(xboxConfig.UseInterpreter);  // Checked = Interpreter
 		    GpuThCbox.SetCheck(xboxConfig.UseThreadedGpu);
-		    SpuIrqCbox.SetCheck(xboxConfig.UseSpuIrq);
+		    SpuIrqCbox.SetCheck(xboxConfig.DisableSpuIrq);  // Checked = Disable IRQ OFF, Unchecked = IRQ ON (default)
 		DisableFrameLimitCbox.SetCheck(xboxConfig.DisableFrameLimiter);
 		DisableFrameSkipCbox.SetCheck(xboxConfig.DisableFrameSkip);
 			ParasiteEveFixCbox.SetCheck(xboxConfig.UseParasiteEveFix);

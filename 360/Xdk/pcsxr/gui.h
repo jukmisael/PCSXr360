@@ -83,7 +83,7 @@ public:
 	bool ResetRequested;
 	bool OsdMenuRequested;
 	bool UseInterpreter;  // 0 = Dynarec (padrão), 1 = Interpreter (Legacy)
-	bool UseSpuIrq;
+	bool DisableSpuIrq;  // 0 = SPU IRQ ON (default/mais compatível), 1 = SPU IRQ OFF
 	bool UseThreadedGpu;
 	bool DisableFrameLimiter;
 	bool DisableFrameSkip;

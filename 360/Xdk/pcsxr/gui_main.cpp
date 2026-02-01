@@ -275,7 +275,7 @@ void SaveGameProfile(void) {
 	fprintf(fp, "# Game ID: %s\n", game_id);
 	fprintf(fp, "UseInterpreter=%d\n", xboxConfig.UseInterpreter);
 	fprintf(fp, "UseThreadedGpu=%d\n", xboxConfig.UseThreadedGpu);
-	fprintf(fp, "UseSpuIrq=%d\n", xboxConfig.UseSpuIrq);
+	fprintf(fp, "DisableSpuIrq=%d\n", xboxConfig.DisableSpuIrq);
 	fprintf(fp, "DisableFrameLimiter=%d\n", xboxConfig.DisableFrameLimiter);
 	fprintf(fp, "DisableFrameSkip=%d\n", xboxConfig.DisableFrameSkip);
 	fprintf(fp, "UseParasiteEveFix=%d\n", xboxConfig.UseParasiteEveFix);
@@ -328,7 +328,7 @@ void LoadGameProfile(void) {
 		// Compatibilidade com arquivos antigos (UseDynarec)
 		else if (strcmp(key, "UseDynarec") == 0) xboxConfig.UseInterpreter = !atoi(value);  // Invertido: UseDynarec=1 -> UseInterpreter=0
 		else if (strcmp(key, "UseThreadedGpu") == 0) xboxConfig.UseThreadedGpu = atoi(value);
-		else if (strcmp(key, "UseSpuIrq") == 0) xboxConfig.UseSpuIrq = atoi(value);
+		else if (strcmp(key, "DisableSpuIrq") == 0) xboxConfig.DisableSpuIrq = atoi(value);
 		else if (strcmp(key, "DisableFrameLimiter") == 0) xboxConfig.DisableFrameLimiter = atoi(value);
 		else if (strcmp(key, "DisableFrameSkip") == 0) xboxConfig.DisableFrameSkip = atoi(value);
 		else if (strcmp(key, "UseParasiteEveFix") == 0) xboxConfig.UseParasiteEveFix = atoi(value);
@@ -348,7 +348,7 @@ void LoadGameProfile(void) {
 void ApplySettings(const char* path) {
 	Config.Cpu        = xboxConfig.UseInterpreter ? CPU_INTERPRETER : CPU_DYNAREC;  // 0 = Dynarec (padrão), 1 = Interpreter
 	Config.RCntFix    = xboxConfig.UseParasiteEveFix;
-	spuirq            = xboxConfig.UseSpuIrq;
+	spuirq            = !xboxConfig.DisableSpuIrq;  // Invert: Disable=0 -> spuirq=1 (ON), Disable=1 -> spuirq=0 (OFF)
 	
 	// Frame Limiter: Invertido - unchecked = ativo (padrão), checked = desativado
 	DebugLog("[ApplySettings] DisableFrameLimiter=%d, DisableFrameSkip=%d", xboxConfig.DisableFrameLimiter, xboxConfig.DisableFrameSkip);
@@ -395,7 +395,7 @@ void LoadSettings() {
 	// Inicializar com valores padrão primeiro
 	xboxConfig.UseInterpreter = 0;       // 0 = Dynarec (padrão), 1 = Interpreter
 	xboxConfig.UseThreadedGpu = 0;       // Threaded GPU desativado
-	xboxConfig.UseSpuIrq = 0;            // SPU IRQ desativado
+	xboxConfig.DisableSpuIrq = 0;        // 0 = SPU IRQ ON (padrão/mais compatível), 1 = SPU IRQ OFF
 	xboxConfig.DisableFrameLimiter = 0;  // Frame limiter ATIVO (0 = não desativa)
 	xboxConfig.DisableFrameSkip = 0;     // Frame skip ATIVO (0 = não desativa)
 	xboxConfig.UseParasiteEveFix = 0;    // Fix desativado
