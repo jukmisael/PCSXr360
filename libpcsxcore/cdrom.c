@@ -1195,7 +1195,14 @@ void cdrInterrupt() {
 			break;
 
 		case CdlReadToc:
-			AddIrqQueue(CdlReadToc + 0x100, cdReadTime * 180 / 4);
+			/* Migalha 6: CdlReadTOC timing ajustado para ~45ms (hardware accurate)
+			 * Was: cdReadTime * 180 / 4 (~600ms) - muito lento!
+			 * Now: 1524600 ciclos (~45ms) - baseado em DuckStation
+			 *
+			 * Afeta: leitura de TOC, jogos multi-disc
+			 * Importante para troca de discos
+			 */
+			AddIrqQueue(CdlReadToc + 0x100, DELAY_READTOC);
 			no_busy_error = 1;
 			start_rotating = 1;
 			break;
