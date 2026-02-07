@@ -908,7 +908,10 @@ void cdrInterrupt() {
 			break;
 
 		case CdlInit:
-			AddIrqQueue(CdlInit + 0x100, cdReadTime * 6);
+			// PHASE 1 FIX: Init timing corrected to ~118ms (hardware accurate)
+			// Was: cdReadTime * 6 (~2.7ms) - too fast, causes timing issues
+			// Now: 4000000 cycles (~118ms) - matches real PSX CDROM init time
+			AddIrqQueue(CdlInit + 0x100, 4000000);
 			no_busy_error = 1;
 			start_rotating = 1;
 			break;
