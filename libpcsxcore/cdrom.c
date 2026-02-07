@@ -991,8 +991,12 @@ void cdrInterrupt() {
 
 			InuYasha - Feudal Fairy Tale: slower
 			- Fixes battles
+			*
+			* Migalha 2: Timing ajustado de ~40ms para ~10ms (hardware accurate)
+			* Was: cdReadTime * 3 (~40ms)
+			* Now: 338688 ciclos (~10ms) - baseado em DuckStation
 			*/
-			AddIrqQueue(CdlPause + 0x100, cdReadTime * 3);
+			AddIrqQueue(CdlPause + 0x100, 338688);
 			cdr.Ctrl |= 0x80;
 			break;
 
