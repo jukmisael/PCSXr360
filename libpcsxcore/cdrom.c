@@ -1145,7 +1145,14 @@ void cdrInterrupt() {
 			break;
 
 		case CdlID:
-			AddIrqQueue(CdlID + 0x100, 20480);
+			/* Migalha 4: CdlID timing ajustado para ~33ms (hardware accurate)
+			 * Was: 20480 ciclos (~0.6ms) - muito rápido
+			 * Now: 1116000 ciclos (~33ms) - baseado em DuckStation
+			 *
+			 * Afeta: identificação do disco durante boot
+			 * Importante para sincronização correta do boot
+			 */
+			AddIrqQueue(CdlID + 0x100, 1116000);
 			break;
 
 		case CdlID + 0x100:
