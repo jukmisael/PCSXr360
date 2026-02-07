@@ -151,6 +151,54 @@ extern SPUregisterCallback SPU_registerCallback;
 // Based on DuckStation/Mednafen specifications
 // ========================================================================
 
+/* FASE 3 - Etapa 3.1: Command delay table (infraestrutura)
+ * Esta tabela contém os delays específicos por comando baseados no hardware real.
+ * Ainda não está em uso - será ativada gradualmente nas próximas etapas.
+ * Delay atual continua sendo 0x800 para todos os comandos.
+ */
+#if 0  /* Desabilitado por enquanto - será ativado na Etapa 3.2 */
+static const u32 s_commandDelays[32] = {
+    25000,     // 0x00 Sync
+    10000,     // 0x01 Nop
+    10000,     // 0x02 Setloc
+    20000,     // 0x03 Play
+    20000,     // 0x04 Forward
+    20000,     // 0x05 Backward
+    20000,     // 0x06 ReadN
+    50000,     // 0x07 Standby
+    50000,     // 0x08 Stop
+    50000,     // 0x09 Pause
+    4000000,   // 0x0A Init (~118ms)
+    10000,     // 0x0B Mute
+    10000,     // 0x0C Demute
+    10000,     // 0x0D Setfilter
+    10000,     // 0x0E Setmode
+    10000,     // 0x0F Getmode
+    10000,     // 0x10 GetlocL
+    10000,     // 0x11 GetlocP
+    20000,     // 0x12 ReadT
+    10000,     // 0x13 GetTN
+    10000,     // 0x14 GetTD
+    100000,    // 0x15 SeekL (~3ms)
+    100000,    // 0x16 SeekP (~3ms)
+    10000,     // 0x17 Setclock
+    10000,     // 0x18 Getclock
+    10000,     // 0x19 Test
+    50000,     // 0x1A GetID
+    20000,     // 0x1B ReadS
+    2000000,   // 0x1C Reset
+    10000,     // 0x1D GetQ
+    50000      // 0x1E ReadTOC
+};
+
+static u32 GetCommandDelay(u8 cmd) {
+    if (cmd < 32) {
+        return s_commandDelays[cmd];
+    }
+    return 10000; // Default delay
+}
+#endif
+
 // Get current LBA from playing position
 u32 GetCurrentLBA(void) {
 	return MSF2SECT(cdr.SetSectorPlay[0], cdr.SetSectorPlay[1], cdr.SetSectorPlay[2]);

@@ -118,10 +118,20 @@ typedef struct {
 	} subq;
 	unsigned char TrackChanged;
 	
-	// PHASE 2: Distance-based seek timing
+	// Distance-based seek timing
 	u32 SeekTicks;           // Calculated seek time in cycles
 	u32 SeekStartLBA;        // Starting LBA for seek
 	u32 SeekTargetLBA;       // Target LBA for seek
+	
+	/* FASE 3 - Etapa 3.1: Prefetch support (infraestrutura)
+	 * Campos para futura implementação de read-ahead.
+	 * Ainda não utilizados - serão ativados nas próximas etapas.
+	 */
+#if 0  /* Desabilitado por enquanto */
+	u8 PrefetchBuffer[2352]; // Prefetched sector data
+	u32 PrefetchLBA;         // LBA of prefetched sector
+	u8 PrefetchValid;        // Prefetch buffer valid flag
+#endif
 } cdrStruct;
 
 extern cdrStruct cdr;
