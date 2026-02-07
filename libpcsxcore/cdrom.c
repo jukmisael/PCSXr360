@@ -964,15 +964,19 @@ void cdrInterrupt() {
 				cdr.SetSectorPlay[2] = cdr.ResultTD[0];
 			}
 
-			StopCdda();
+		StopCdda();
 			StopReading();
 
-			delay = 0x800;
-			if (cdr.DriveState == DRIVESTATE_STANDBY)
-				delay = cdReadTime * 30 / 2;
-
+			/* Migalha 3: CdlStop timing consistente ~50ms (hardware accurate)
+			 * Was: 0x800 (~0.2ms) OR cdReadTime * 30 / 2 (~188ms) - inconsistente
+			 * Now: 1693440 ciclos (~50ms) - baseado em DuckStation
+			 *
+			 * Affected games:
+			 * - Todos os jogos que usam Stop/Resume
+			 * - Melhora consistência no gerenciamento de estado do drive
+			 */
 			cdr.DriveState = DRIVESTATE_STOPPED;
-			AddIrqQueue(CdlStop + 0x100, delay);
+			AddIrqQueue(CdlStop + 0x100, 1693440);
 			break;
 
 		case CdlStop + 0x100:
