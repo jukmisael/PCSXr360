@@ -147,7 +147,8 @@ extern void CALLBACK SPUirq(void);
 extern SPUregisterCallback SPU_registerCallback;
 
 // ========================================================================
-// PHASE 2: Distance-based seek timing functions (from DuckStation)
+// CD-ROM Timing Functions - Hardware Accurate
+// Based on DuckStation/Mednafen specifications
 // ========================================================================
 
 // Get current LBA from playing position
@@ -810,16 +811,12 @@ void cdrInterrupt() {
 		case CdlPlay:
 			StopCdda();
 			if (cdr.Seeked == SEEK_PENDING) {
-				// XXX: wrong, should seek instead..
 				cdr.Seeked = SEEK_DONE;
 			}
 			if (cdr.SetlocPending) {
 				memcpy(cdr.SetSectorPlay, cdr.SetSector, 4);
 				cdr.SetlocPending = 0;
 			}
-
-			// BIOS CD Player
-			// - Pause player, hit Track 01/02/../xx (Setloc issued!!)
 
 			if (cdr.ParamC == 0 || cdr.Param[0] == 0) {
 #ifdef CDR_LOG
@@ -959,9 +956,8 @@ void cdrInterrupt() {
 			break;
 
 		case CdlInit:
-			// PHASE 1 FIX: Init timing corrected to ~118ms (hardware accurate)
-			// Was: cdReadTime * 6 (~2.7ms) - too fast, causes timing issues
-			// Now: 4000000 cycles (~118ms) - matches real PSX CDROM init time
+			/* Init timing: ~118ms (4000000 cycles)
+			 * Matches real PSX CDROM hardware initialization time */
 			AddIrqQueue(CdlInit + 0x100, 4000000);
 			no_busy_error = 1;
 			start_rotating = 1;
@@ -1053,29 +1049,16 @@ void cdrInterrupt() {
 		case CdlSeekL:
 	
 		case CdlSeekP:
-			StopCdda();
+		StopCdda();
 			StopReading();
 			cdr.StatP |= STATUS_SEEK;
-
 			
-	//		Crusaders of Might and Magic = 0.5x-4x
-	//		- fix cutscene speech start
-
-	//		Eggs of Steel = 2x-?
-	//		- fix new game
-
-	//		Medievil = ?-4x
-	//		- fix cutscene speech
-
-	//		Rockman X5 = 0.5-4x
-	//		- fix capcom logo
-			
-		// PHASE 2: Use distance-based seek timing
+			/* Hardware-accurate seek timing based on LBA distance
+			 * This replaces the old fixed cdReadTime * 4 timing */
 			if (cdr.Seeked == SEEK_DONE) {
 				CDRMISC_INT(0x800);
 			}
 			else {
-				// Use calculated seek time if available, otherwise fallback
 				if (cdr.SeekTicks > 0) {
 					CDRMISC_INT(cdr.SeekTicks);
 				}
