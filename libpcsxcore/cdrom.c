@@ -1154,9 +1154,9 @@ void cdrInterrupt() {
 			break;
 
 		case CdlID:
-			/* Migalha 4: CdlID timing ajustado para ~33ms (hardware accurate)
+			/* Migalha 4: CdlID timing ajustado para ~1ms (hardware accurate)
 			 * Was: 20480 ciclos (~0.6ms) - muito rápido
-			 * Now: DELAY_GETID ciclos (~33ms) - baseado em DuckStation
+			 * Now: DELAY_GETID ciclos (~1ms) - DuckStation: ID_READ_TICKS = 33868
 			 *
 			 * Afeta: identificação do disco durante boot
 			 * Importante para sincronização correta do boot

@@ -44,7 +44,7 @@ extern "C" {
 // ========================================================================
 
 // Phase 1-2: Seek timing
-#define MIN_SEEK_TICKS			33868		// ~1ms minimum
+#define MIN_SEEK_TICKS			30000		// ~0.88ms minimum (DuckStation)
 #define SEEK_TICKS_SHORT		135472		// ~4ms for track jumps
 #define SEEK_TICKS_MEDIUM_BASE	677360		// ~20ms base
 #define SEEK_TICKS_LONG_BASE	3386880		// ~100ms base
@@ -54,7 +54,7 @@ extern "C" {
 #define DELAY_INIT				4000000		// ~118ms - CdlInit (Migalha 1)
 #define DELAY_PAUSE				338688			// ~10ms - CdlPause (Migalha 2)
 #define DELAY_STOP				1693440			// ~50ms - CdlStop (Migalha 3)
-#define DELAY_GETID				1116000			// ~33ms - CdlGetID (Migalha 4)
+#define DELAY_GETID				33868			// ~1ms - CdlGetID (DuckStation: ID_READ_TICKS)
 #define DELAY_READTOC			1524600			// ~45ms - CdlReadToc (Migalha 6)
 
 // Migalha 7: Minimum delay entre interrupções (DuckStation)
