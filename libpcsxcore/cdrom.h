@@ -50,12 +50,15 @@ extern "C" {
 #define SEEK_TICKS_LONG_BASE	3386880		// ~100ms base
 #define MAX_SEEK_TICKS			4000000		// ~118ms cap
 
-// Migalhas 1-6: Command-specific response delays (in CDROM clock cycles)
+// Migalhas 1-7: Command-specific response delays (in CDROM clock cycles)
 #define DELAY_INIT				4000000		// ~118ms - CdlInit (Migalha 1)
 #define DELAY_PAUSE				338688			// ~10ms - CdlPause (Migalha 2)
 #define DELAY_STOP				1693440			// ~50ms - CdlStop (Migalha 3)
 #define DELAY_GETID				1116000			// ~33ms - CdlGetID (Migalha 4)
 #define DELAY_READTOC			1524600			// ~45ms - CdlReadToc (Migalha 6)
+
+// Migalha 7: Minimum delay entre interrupções (DuckStation)
+#define MINIMUM_INTERRUPT_DELAY	1000			// 1000 ciclos mínimo entre IRQs
 
 // Legacy default delay (0x800 = ~0.2ms)
 #define DELAY_DEFAULT			0x800

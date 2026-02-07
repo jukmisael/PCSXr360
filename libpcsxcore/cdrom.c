@@ -596,6 +596,15 @@ static void AddIrqQueue(unsigned short irq, unsigned long ecycle) {
 	}
 
 	cdr.Irq = irq;
+	
+	/* Migalha 7: Aplica delay mínimo entre interrupções
+	 * Baseado em DuckStation MINIMUM_INTERRUPT_DELAY = 1000
+	 * Previne interrupções muito rápidas consecutivas
+	 */
+	if (ecycle < MINIMUM_INTERRUPT_DELAY) {
+		ecycle = MINIMUM_INTERRUPT_DELAY;
+	}
+	
 	cdr.eCycle = ecycle;
 
 	CDR_INT(ecycle);
