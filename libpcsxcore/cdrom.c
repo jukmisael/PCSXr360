@@ -168,7 +168,7 @@ static const u32 s_commandDelays[32] = {
     50000,     // 0x07 Standby
     50000,     // 0x08 Stop
     50000,     // 0x09 Pause
-    4000000,   // 0x0A Init (~118ms)
+    DELAY_INIT,   // 0x0A Init (~118ms)
     10000,     // 0x0B Mute
     10000,     // 0x0C Demute
     10000,     // 0x0D Setfilter
@@ -969,14 +969,14 @@ void cdrInterrupt() {
 
 			/* Migalha 3: CdlStop timing consistente ~50ms (hardware accurate)
 			 * Was: 0x800 (~0.2ms) OR cdReadTime * 30 / 2 (~188ms) - inconsistente
-			 * Now: 1693440 ciclos (~50ms) - baseado em DuckStation
+			 * Now: DELAY_STOP ciclos (~50ms) - baseado em DuckStation
 			 *
 			 * Affected games:
 			 * - Todos os jogos que usam Stop/Resume
 			 * - Melhora consistência no gerenciamento de estado do drive
 			 */
 			cdr.DriveState = DRIVESTATE_STOPPED;
-			AddIrqQueue(CdlStop + 0x100, 1693440);
+			AddIrqQueue(CdlStop + 0x100, DELAY_STOP);
 			break;
 
 		case CdlStop + 0x100:
@@ -998,9 +998,9 @@ void cdrInterrupt() {
 			*
 			* Migalha 2: Timing ajustado de ~40ms para ~10ms (hardware accurate)
 			* Was: cdReadTime * 3 (~40ms)
-			* Now: 338688 ciclos (~10ms) - baseado em DuckStation
+			* Now: DELAY_PAUSE ciclos (~10ms) - baseado em DuckStation
 			*/
-			AddIrqQueue(CdlPause + 0x100, 338688);
+			AddIrqQueue(CdlPause + 0x100, DELAY_PAUSE);
 			cdr.Ctrl |= 0x80;
 			break;
 
@@ -1012,9 +1012,9 @@ void cdrInterrupt() {
 			break;
 
 		case CdlInit:
-			/* Init timing: ~118ms (4000000 cycles)
+			/* Init timing: ~118ms (DELAY_INIT cycles)
 			 * Matches real PSX CDROM hardware initialization time */
-			AddIrqQueue(CdlInit + 0x100, 4000000);
+			AddIrqQueue(CdlInit + 0x100, DELAY_INIT);
 			no_busy_error = 1;
 			start_rotating = 1;
 			break;
@@ -1147,12 +1147,12 @@ void cdrInterrupt() {
 		case CdlID:
 			/* Migalha 4: CdlID timing ajustado para ~33ms (hardware accurate)
 			 * Was: 20480 ciclos (~0.6ms) - muito rápido
-			 * Now: 1116000 ciclos (~33ms) - baseado em DuckStation
+			 * Now: DELAY_GETID ciclos (~33ms) - baseado em DuckStation
 			 *
 			 * Afeta: identificação do disco durante boot
 			 * Importante para sincronização correta do boot
 			 */
-			AddIrqQueue(CdlID + 0x100, 1116000);
+			AddIrqQueue(CdlID + 0x100, DELAY_GETID);
 			break;
 
 		case CdlID + 0x100:

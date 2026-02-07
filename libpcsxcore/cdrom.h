@@ -38,12 +38,26 @@ extern "C" {
 
 #define MSF2SECT(m, s, f)		(((m) * 60 + (s) - 2) * 75 + (f))
 
-// PHASE 2: Distance-based seek timing constants (from DuckStation)
+// ========================================================================
+// CD-ROM COMMAND TIMING CONSTANTS (Hardware Accurate)
+// Based on DuckStation/Mednafen specifications
+// ========================================================================
+
+// Phase 1-2: Seek timing
 #define MIN_SEEK_TICKS			33868		// ~1ms minimum
 #define SEEK_TICKS_SHORT		135472		// ~4ms for track jumps
 #define SEEK_TICKS_MEDIUM_BASE	677360		// ~20ms base
 #define SEEK_TICKS_LONG_BASE	3386880		// ~100ms base
 #define MAX_SEEK_TICKS			4000000		// ~118ms cap
+
+// Migalhas 1-4: Command-specific response delays (in CDROM clock cycles)
+#define DELAY_INIT				4000000		// ~118ms - CdlInit (Migalha 1)
+#define DELAY_PAUSE				338688			// ~10ms - CdlPause (Migalha 2)
+#define DELAY_STOP				1693440			// ~50ms - CdlStop (Migalha 3)
+#define DELAY_GETID				1116000			// ~33ms - CdlGetID (Migalha 4)
+
+// Legacy default delay (0x800 = ~0.2ms)
+#define DELAY_DEFAULT			0x800
 
 #define CD_FRAMESIZE_RAW		2352
 #define DATA_SIZE				(CD_FRAMESIZE_RAW - 12)
