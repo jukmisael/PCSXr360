@@ -146,6 +146,57 @@ extern long CALLBACK ISOinit(void);
 extern void CALLBACK SPUirq(void);
 extern SPUregisterCallback SPU_registerCallback;
 
+// ========================================================================
+// PHASE 2: Distance-based seek timing functions (from DuckStation)
+// ========================================================================
+
+// Get current LBA from playing position
+u32 GetCurrentLBA(void) {
+	return MSF2SECT(cdr.SetSectorPlay[0], cdr.SetSectorPlay[1], cdr.SetSectorPlay[2]);
+}
+
+// Calculate seek time based on LBA distance
+u32 CalculateSeekTicks(u32 from_lba, u32 to_lba) {
+	u32 distance;
+	u32 ticks;
+	
+	// Calculate absolute distance
+	if (to_lba > from_lba)
+		distance = to_lba - from_lba;
+	else
+		distance = from_lba - to_lba;
+	
+	// Store for debugging
+	cdr.SeekStartLBA = from_lba;
+	cdr.SeekTargetLBA = to_lba;
+	
+	// Determine seek type and calculate timing
+	if (distance == 0) {
+		// No seek needed
+		ticks = MIN_SEEK_TICKS;
+	}
+	else if (distance <= 3) {
+		// Forward seek: just wait for sector to come around
+		ticks = MIN_SEEK_TICKS;
+	}
+	else if (distance <= 16) {
+		// Track jump
+		ticks = SEEK_TICKS_SHORT + (distance * 5000);
+	}
+	else if (distance <= 1000) {
+		// Medium seek
+		ticks = SEEK_TICKS_MEDIUM_BASE + (distance * 200);
+	}
+	else {
+		// Long/sled seek
+		ticks = SEEK_TICKS_LONG_BASE + (distance * 100);
+		if (ticks > MAX_SEEK_TICKS)
+			ticks = MAX_SEEK_TICKS;
+	}
+	
+	return ticks;
+}
+
 // A bit of a kludge, but it will get rid of the "macro redefined" warnings
 
 #ifdef H_SPUirqAddr
@@ -1019,10 +1070,19 @@ void cdrInterrupt() {
 	//		Rockman X5 = 0.5-4x
 	//		- fix capcom logo
 			
-			CDRMISC_INT(cdr.Seeked == SEEK_DONE ? 0x800 : cdReadTime * 4);
+			// PHASE 2: Use distance-based seek timing
+			if (cdr.Seeked == SEEK_DONE) {
+				CDRMISC_INT(0x800);
+			} else {
+				// Use calculated seek time if available, otherwise fallback
+				if (cdr.SeekTicks > 0)
+					CDRMISC_INT(cdr.SeekTicks);
+				else
+					CDRMISC_INT(cdReadTime * 4);
+			}
 			cdr.Seeked = SEEK_PENDING;
 			start_rotating = 1;
-			break; 
+			break;
 
 		case CdlTest:
 			switch (cdr.Param[0]) {
@@ -1461,18 +1521,28 @@ void cdrWrite1(unsigned char rt) {
 
 	switch (cdr.Cmd) {
 	case CdlSetloc:
+	{
+		u32 current_lba, target_lba;
+		
 		for (i = 0; i < 3; i++)
 			set_loc[i] = btoi(cdr.Param[i]);
 
-		i = msf2sec(cdr.SetSectorPlay);
-		i = abs(i - msf2sec(set_loc));
-		if (i > 16)
+		// PHASE 2: Calculate distance-based seek timing
+		current_lba = msf2sec(cdr.SetSectorPlay);
+		target_lba = msf2sec(set_loc);
+		
+		// Calculate seek time based on LBA distance
+		cdr.SeekTicks = CalculateSeekTicks(current_lba, target_lba);
+		
+		// Legacy: Mark as pending if significant distance
+		if (abs((int)(target_lba - current_lba)) > 16)
 			cdr.Seeked = SEEK_PENDING;
 
 		memcpy(cdr.SetSector, set_loc, 3);
 		cdr.SetSector[3] = 0;
 		cdr.SetlocPending = 1;
 		break;
+	}
 
 	case CdlReadN:
 	case CdlReadS:

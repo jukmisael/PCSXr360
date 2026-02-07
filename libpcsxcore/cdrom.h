@@ -38,6 +38,13 @@ extern "C" {
 
 #define MSF2SECT(m, s, f)		(((m) * 60 + (s) - 2) * 75 + (f))
 
+// PHASE 2: Distance-based seek timing constants (from DuckStation)
+#define MIN_SEEK_TICKS			33868		// ~1ms minimum
+#define SEEK_TICKS_SHORT		135472		// ~4ms for track jumps
+#define SEEK_TICKS_MEDIUM_BASE	677360		// ~20ms base
+#define SEEK_TICKS_LONG_BASE	3386880		// ~100ms base
+#define MAX_SEEK_TICKS			4000000		// ~118ms cap
+
 #define CD_FRAMESIZE_RAW		2352
 #define DATA_SIZE				(CD_FRAMESIZE_RAW - 12)
 
@@ -110,12 +117,21 @@ typedef struct {
 		unsigned char Absolute[3];
 	} subq;
 	unsigned char TrackChanged;
+	
+	// PHASE 2: Distance-based seek timing
+	u32 SeekTicks;           // Calculated seek time in cycles
+	u32 SeekStartLBA;        // Starting LBA for seek
+	u32 SeekTargetLBA;       // Target LBA for seek
 } cdrStruct;
 
 extern cdrStruct cdr;
 
 void cdrReset();
 void cdrAttenuate(s16 *buf, int samples, int stereo);
+
+// PHASE 2: Distance-based seek timing
+u32 CalculateSeekTicks(u32 from_lba, u32 to_lba);
+u32 GetCurrentLBA(void);
 
 void cdrInterrupt();
 void cdrReadInterrupt();
