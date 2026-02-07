@@ -1070,15 +1070,18 @@ void cdrInterrupt() {
 	//		Rockman X5 = 0.5-4x
 	//		- fix capcom logo
 			
-			// PHASE 2: Use distance-based seek timing
+		// PHASE 2: Use distance-based seek timing
 			if (cdr.Seeked == SEEK_DONE) {
 				CDRMISC_INT(0x800);
-			} else {
+			}
+			else {
 				// Use calculated seek time if available, otherwise fallback
-				if (cdr.SeekTicks > 0)
+				if (cdr.SeekTicks > 0) {
 					CDRMISC_INT(cdr.SeekTicks);
-				else
+				}
+				else {
 					CDRMISC_INT(cdReadTime * 4);
+				}
 			}
 			cdr.Seeked = SEEK_PENDING;
 			start_rotating = 1;
@@ -1521,28 +1524,23 @@ void cdrWrite1(unsigned char rt) {
 
 	switch (cdr.Cmd) {
 	case CdlSetloc:
-	{
-		u32 current_lba, target_lba;
-		
 		for (i = 0; i < 3; i++)
 			set_loc[i] = btoi(cdr.Param[i]);
 
 		// PHASE 2: Calculate distance-based seek timing
-		current_lba = msf2sec(cdr.SetSectorPlay);
-		target_lba = msf2sec(set_loc);
-		
-		// Calculate seek time based on LBA distance
-		cdr.SeekTicks = CalculateSeekTicks(current_lba, target_lba);
+		// Move variable declarations to function level for C89 compatibility
+		cdr.SeekTicks = CalculateSeekTicks(
+			msf2sec(cdr.SetSectorPlay),
+			msf2sec(set_loc));
 		
 		// Legacy: Mark as pending if significant distance
-		if (abs((int)(target_lba - current_lba)) > 16)
+		if (abs((int)(msf2sec(set_loc) - msf2sec(cdr.SetSectorPlay))) > 16)
 			cdr.Seeked = SEEK_PENDING;
 
 		memcpy(cdr.SetSector, set_loc, 3);
 		cdr.SetSector[3] = 0;
 		cdr.SetlocPending = 1;
 		break;
-	}
 
 	case CdlReadN:
 	case CdlReadS:
